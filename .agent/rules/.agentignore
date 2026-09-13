@@ -1,0 +1,40 @@
+# Keeps secrets, build artefacts and heavy binaries out of the agent's context window.
+# This is a token-cost and hallucination-surface control, not housekeeping.
+
+# ── Secrets — never read, never quote ────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Dependencies and build output ────────────────────────────────────────────
+node_modules/
+vendor/
+dist/
+.next/
+coverage/
+storage/framework/
+bootstrap/cache/
+
+# ── Heavy or binary assets ───────────────────────────────────────────────────
+uploads/
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.zip
+*.tar.gz
+
+# ── Lockfiles: huge, low information ─────────────────────────────────────────
+package-lock.json
+composer.lock
+
+# ── Logs and local scratch ───────────────────────────────────────────────────
+*.log
+.DS_Store
+tmp/
+
+# Note: the *.pdf rule above would also match .ai-context/source-docs/INT SDD BluePrint - V1.0.pdf
+# and any future requirement PDF placed directly in this repo. Read a source document
+# deliberately, by path, when authoring a BRD entry or spec — do not rely on it entering context
+# through general directory listing.

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/INT/AppData/Local/Temp/claude/reqsdd_extract/**)",
+      "Read(//c/Users/INT/AppData/Local/Temp/claude/xlsx_extract/xl/**)",
+      "Read(//c/Users/INT/AppData/Local/Temp/claude/xlsx_extract/xl/worksheets/**)",
+      "Bash(rm -rf \"/c/Users/INT/AppData/Local/Temp/claude/xlsx_extract\" \"/c/Users/INT/AppData/Local/Temp/claude/reqsdd_extract\" 2>&1; echo done)",
+      "PowerShell(Get-Process EXCEL -ErrorAction SilentlyContinue)",
+      "Bash(ls -la \"C:\\\\Users\\\\INT\\\\.claude\\\\projects\\\\c--xampp-htdocs-employee-portal-sdd\\\\memory\\\\\" 2>&1)",
+      "Read(//c/Users/INT/.claude/projects/c--xampp-htdocs-employee-portal-sdd/**)",
+      "Bash(ls -la 'C:\\\\Users\\\\INT\\\\.claude\\\\projects\\\\c--xampp-htdocs-employee-portal-sdd\\\\memory\\\\' 2>&1)",
+      "Read(//c/Users/INT/.claude/projects/c--xampp-htdocs-employee-portal-sdd/memory/**)",
+      "Bash(rm -rf _archive)",
+      "Bash(rm -f SRS.md architecture.md)",
+      "Bash(rm -rf inventory)",
+      "Bash(rm -rf templates)",
+      "Bash(rm -f source-docs/README.md source-docs/proposal-extract.md)",
+      "Read(//c/xampp/htdocs/employee_portal_sdd/.ai-context/source-docs/**)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\INT\\AppData\\Local\\Temp\\claude\\xlsx_extract"
+    ]
+  }
+}
