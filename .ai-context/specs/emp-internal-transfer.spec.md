@@ -108,6 +108,88 @@ SDD discovery capability and a strong understanding of the business journey. App
 conditional on addressing the above workflow and authorization ambiguities before proceeding to
 detailed implementation planning."
 
+### Gate 1 Review Comments (Part 2 — spec-level review) — Sourav Kumar Maity, 2026-09-15
+
+A second pass by the same reviewer, same day, examining this spec document itself (acceptance
+criteria, API contract, and state model) rather than the BRD/journey level covered in Part 1 above.
+Recorded verbatim as provided.
+
+**Overall assessment:** The specification demonstrates a good understanding of the Employee
+Internal Transfer business journey and shows strong application of SDD practices — clear
+acceptance criteria, API contracts, error handling, frontend/backend responsibility boundaries, and
+requirement-to-test traceability. It is also positive that the specification does not silently
+invent several unresolved business rules (eligibility criteria, effective-date lead time,
+concurrent requests, downstream applicability, audit requirements). However, a few important gaps
+and inconsistencies remain between the business journey, acceptance criteria, API contract, and
+state model, to be addressed before approval for the Technical Plan / Task Decomposition stage.
+
+**Required Gate 1 clarifications:**
+
+1. **Downstream processing completion — Critical.** AC10/AC11 require organisational-information,
+   Payroll, IT, and Facilities activities to be tracked and completed individually, but the current
+   API contract does not define how these downstream stakeholders mark their activities complete.
+   Clarify: who is authorized to complete each downstream activity; how the completion action is
+   submitted; which API/contract handles the action; how an individual downstream step transitions
+   from pending to complete; and how the system determines all applicable steps are complete. API03
+   (`emp-internal-transfer.API03`, this file's [Approval / Stage Action](#emp-internal-transferapi03--approval--stage-action)
+   section) currently only defines `approve | decline` for Manager/HR decisions — there is
+   currently no mechanism for implementing AC11. *(New contract gap, not previously tracked — the
+   existing "Contract Gaps" table only notes a downstream-status-detail endpoint depends on
+   Q06/Q07, not the completion-submission mechanism itself.)*
+2. **State transition model — Critical.** Make the complete state-transition model explicit,
+   specifically: `hr_approved` → `completed` when no downstream activity applies, versus
+   `hr_approved` → `downstream_processing` → `completed` when one or more applies. The current
+   status vocabulary table (this file's "Status and pending-with vocabulary" section) marks
+   `hr_approved` as non-terminal unconditionally, but AC11 allows completion directly once *"every
+   downstream step that applies (if any)"* is complete — including the zero-downstream-steps case.
+   This should be made internally consistent. *(New — an internal inconsistency in this spec, not a
+   BRD-level open item.)*
+3. **Downstream applicability rule — Critical.** Q07 is correctly identified as open, but AC10/AC11
+   depend directly on it. Either obtain/record the business rule determining whether Payroll, IT,
+   Facilities, and organisational-information activities apply, or explicitly document the
+   controlled assumption to be used for the next SDD stage — the technical implementation must not
+   independently decide business applicability. *(Maps to the existing open item
+   [Q07](../BRD.md).)*
+4. **Manager → HR sequencing.** Confirm explicitly whether HR validation is allowed only after
+   manager approval, or whether Manager and HR activities may happen in parallel; if sequential
+   processing is a confirmed business rule, reflect it explicitly in the BRD/specification and the
+   state-transition model. *(Same point as Part 1's observation 3 above — restated here against the
+   state model specifically; still not covered by an existing Q-item.)*
+5. **Authorization / RBAC.** Ensure requester/manager/HR as the permitted viewers/actors is clearly
+   marked as a proposed assumption until [Q11](../BRD.md) resolves, and clarify the authorization
+   model for downstream stakeholders once their completion actions are introduced (see
+   clarification 1 above). *(Extends Part 1's observation 5 — the downstream-stakeholder
+   authorization angle is new, tied to the new completion-mechanism gap.)*
+6. **Department / Location / Role selection.** AC04 validates that submitted references must be
+   valid/selectable, but the business rule for which department/location/role values are selectable
+   is undefined. Distinguish the business decision (which options are valid for an employee) from
+   the technical decision (which system/API provides those options) — the reference-data API can
+   remain a technical-plan item, but the underlying business rule should be identified. *(Same
+   point as Part 1's observation 6 above, restated with the business/technical split made explicit.)*
+7. **Status visibility.** AC12 currently limits status viewing to non-completed requests, but the
+   source requirement states the employee should be able to view the current status of the request
+   without explicitly excluding completed requests. Confirm whether employees should be able to
+   view the final status/history of completed or rejected requests as well. *(New — a discrepancy
+   between this spec's AC12 wording and the BRD source, not previously flagged.)*
+8. **Employee confirmation.** Clarify what "employee receives confirmation" means: the
+   specification currently interprets this primarily as final transfer completion. Consider
+   distinguishing submission confirmation, approval/rejection outcome, and final transfer-completion
+   confirmation — only including the events actually required by the business. *(Extends Part 1's
+   observation 7 above with a third named event, approval/rejection outcome.)*
+
+**Positive observations to retain:** stable and individually identifiable acceptance criteria; good
+Given/When/Then structure; clear API request/response contracts; good error handling and negative
+scenarios; appropriate separation of business and technical decisions; good frontend/backend
+responsibility boundary; good authorization scenarios; good BRD → AC → API → Test traceability;
+appropriate handling of unresolved business rules without silently inventing requirements.
+
+**Gate 1 recommendation (reviewer's words):** PASS WITH CONDITIONS — "The specification is
+substantially aligned with the BRD and demonstrates good SDD capability. However, approval should
+be conditional on resolving the downstream completion mechanism, state-transition consistency,
+downstream applicability, sequencing, and authorization questions before moving to the Technical
+Plan and Task Decomposition. Please update the specification and associated BRD/open-decision items
+where required, then submit the revised version for Gate 1 re-review."
+
 ## Linked BRD
 [`.ai-context/BRD.md#brd-001-employee-internal-transfer-digital-journey`](../BRD.md#brd-001-employee-internal-transfer-digital-journey)
 

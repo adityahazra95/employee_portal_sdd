@@ -867,3 +867,32 @@ and the spec's acceptance criteria were not themselves revised — that is the d
 **Follow-up:** Developer (Aditya Hazra) to revise BRD/spec addressing the reviewer's four focus
 areas (conditional downstream workflow, rejection/failure handling, Manager/HR sequencing,
 authorization/stakeholder ownership), then resubmit for another Gate 1 pass.
+
+### 2026-09-15 — emp-internal-transfer.Day4.gate1-review-spec-level
+
+**Prompted by:** Sourav Kumar Maity (Gate 1 Reviewer)
+**Instruction (summary):** Same-day second Gate 1 review pass, this time against
+`specs/emp-internal-transfer.spec.md` itself (acceptance criteria, API contract, state model)
+rather than the BRD/journey level covered by the first pass — 8 numbered clarifications, positive
+observations, and a decision of `PASS WITH CONDITIONS`.
+**Artefacts touched:** `specs/emp-internal-transfer.spec.md` (new "Part 2 — spec-level review"
+block appended to the Gate 1 Review section, full text recorded verbatim), `status.md` (new "Day 4
+execution log (continued)" entry), `prompt_history.md` (this entry).
+**Outcome:** Recorded verbatim. Three clarifications are genuinely new gaps not previously tracked
+by BRD Q01–Q11 or the first review pass: no API/authorization mechanism exists for a downstream
+stakeholder to mark their own step complete (AC11 currently has no implementable path via API03,
+which only defines `approve|decline`); an internal inconsistency between the status vocabulary
+(`hr_approved` marked unconditionally non-terminal) and AC11 (allows direct completion when zero
+downstream steps apply); and a scope question on whether AC12's non-completed-only status
+visibility matches the BRD source (which doesn't state that exclusion). The remaining five
+clarifications restate/extend the first pass's observations against this spec's concrete
+artefacts (Q07 downstream applicability, Manager→HR sequencing, Q11 RBAC plus a new
+downstream-actor-authorization angle, department/location/role business-vs-technical split, and
+employee confirmation split into three candidate events). Decision recorded again as
+`PASS WITH CONDITIONS`; gating treatment unchanged from the first pass (not yet Approved). No BRD or
+spec content was revised in this entry — recording only. No tests run; no code, `.plan.md`, or
+`.tasks.md` created.
+**Follow-up:** Developer (Aditya Hazra) to revise `BRD.md`/`specs/emp-internal-transfer.spec.md`
+addressing both review passes together — in particular the new downstream-completion API mechanism,
+the `hr_approved`/AC11 state-model inconsistency, and the AC12 completed-status-visibility
+question — then resubmit for Gate 1 re-review.

@@ -199,3 +199,31 @@ the reviewer's actual decision is a separate, later step.
 addressing the four focus areas the reviewer named (conditional downstream workflow,
 rejection/failure handling, Manager/HR sequencing, authorization and stakeholder ownership), then
 resubmits for another Gate 1 pass.
+
+## Day 4 execution log (continued) — 2026-09-15, spec-level review
+
+- Same-day second pass by Sourav Kumar Maity (Gate 1 Reviewer), this time against
+  `specs/emp-internal-transfer.spec.md` itself (acceptance criteria, API contract, state model)
+  rather than the BRD/journey level covered by the first pass above. Recorded verbatim in the
+  spec's Gate 1 Review section as "Part 2 — spec-level review."
+- Three **new** gaps surfaced that were not tracked by either the BRD's Q01–Q11 or the first review
+  pass: (a) **downstream-completion mechanism** — API03 only defines `approve|decline` for
+  Manager/HR; no API/authorization mechanism exists for a downstream stakeholder (Payroll/IT/
+  Facilities/org-info) to mark their own step complete, so AC11 currently has no implementable path;
+  (b) **state-model inconsistency** — the status vocabulary marks `hr_approved` non-terminal
+  unconditionally, but AC11 allows direct completion when zero downstream steps apply, which the
+  vocabulary table doesn't yet express; (c) **status-visibility scope** — AC12 restricts status
+  viewing to non-completed requests, but the BRD source does not state that exclusion; whether
+  employees can view completed/rejected request status is unconfirmed.
+- Remaining points restate/extend Part 1's observations against the spec's concrete artefacts:
+  downstream applicability (Q07), Manager→HR sequencing, RBAC (Q11, plus a new downstream-actor
+  authorization angle once clarification (a) is resolved), department/location/role selection
+  (business vs. technical split), and employee confirmation (now split into three candidate events:
+  submission, approval/rejection outcome, final completion).
+- Decision recorded again as `PASS WITH CONDITIONS` (reviewer's wording) — consistent with Part 1;
+  gating treatment unchanged (not yet Approved; `plans/`/`tasks/` remain blocked).
+- No BRD/spec revision made in this entry — recording the review only, per the developer's
+  follow-up responsibility.
+
+**Next:** unchanged — developer revises `BRD.md`/`specs/emp-internal-transfer.spec.md` addressing
+both review passes (BRD-level and spec-level) together, then resubmits for Gate 1 re-review.
