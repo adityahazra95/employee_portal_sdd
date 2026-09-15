@@ -1,6 +1,6 @@
 # Project Status Board
 
-_Last updated: 2026-09-08 (Day 3) — updated by: Aditya Hazra (Developer)_
+_Last updated: 2026-09-15 (Day 4) — updated by: Sourav Kumar Maity (Gate 1 Reviewer)_
 
 Single source of truth for **what is happening right now**. Updated the same day by whoever last
 touched an artefact.
@@ -20,16 +20,16 @@ touched an artefact.
 | Item | State |
 |---|---|
 | Feature | `emp-internal-transfer` — Employee Internal Transfer Digital Journey |
-| Stage | **In Peer Review (Gate 1)** |
+| Stage | **Gate 1 — Pass with Conditions (revision required)** |
 | Owner | Developer (Aditya Hazra) |
 | Gate 1 Reviewer | **Sourav Kumar Maity** |
-| SDD chain position | Day 3 of the assessment's recommended 10-day timeline complete |
+| SDD chain position | Day 4 of the assessment's recommended 10-day timeline complete (Gate 1 review recorded) |
 
 ## Active specs
 
 | Spec ID | Title | Status | Owner | Last Updated | Notes |
 |---|---|---|---|---|---|
-| `emp-internal-transfer` | Employee Internal Transfer Digital Journey | **In Peer Review (Gate 1)** | Developer | 2026-09-08 | `specs/emp-internal-transfer.spec.md`: AC01–AC17, full API contract (API01–API03) with exception tables, error envelope, Next.js consumer contract, UT01–UT17, full BRD→AC→API→UT traceability. Broader QA scenarios in `test_cases/emp-internal-transfer.test_cases.md`. **Next:** Gate 1 reviewer assignment, then review |
+| `emp-internal-transfer` | Employee Internal Transfer Digital Journey | **Gate 1 — Pass with Conditions** | Developer | 2026-09-15 | Gate 1 review recorded by Sourav Kumar Maity (2026-09-15) in the spec's Gate 1 Review block: decision `PASS WITH CONDITIONS`, treated as **not yet Approved** for gating purposes. Conditions focus on conditional downstream workflow (Q07), rejection/failure handling (Q08), Manager→HR sequencing, and authorization/stakeholder ownership (Q06/Q11). **Next:** developer revises BRD/spec addressing the recorded conditions, then a re-review |
 
 ## Baseline artefacts
 
@@ -40,7 +40,7 @@ touched an artefact.
 | `BRD.md` | Authored — BRD-001 | Seeded from `source-docs/Requirement for SDD.docx`; 11 open questions (Q01–Q11) recorded, none silently resolved |
 | `.agent/rules/int-standards.laravel.md` | Created | Defaults only — no Laravel code exists in this repo yet to verify against |
 | `.agent/rules/int-standards.nextjs.md` | Created | Defaults only — no Next.js code exists in this repo yet to verify against |
-| `specs/emp-internal-transfer.spec.md` | **In Peer Review (Gate 1)** | AC01–AC17, Out of Scope, NFRs, frontend/backend boundary, full API contract (API01–API03), error contract, Next.js consumer contract, UT01–UT17, full traceability |
+| `specs/emp-internal-transfer.spec.md` | **Gate 1 — Pass with Conditions (2026-09-15)** | AC01–AC17, Out of Scope, NFRs, frontend/backend boundary, full API contract (API01–API03), error contract, Next.js consumer contract, UT01–UT17, full traceability; Gate 1 review comments from Sourav Kumar Maity recorded in the spec's Gate 1 Review section, revision required before re-review |
 | `test_cases/emp-internal-transfer.test_cases.md` | Authored | Broader QA scenarios: API, validation/boundary, auth/RBAC, state-transition, concurrency, contract, Next.js consumer, UI states, accessibility, cross-browser, regression |
 | `plans/`, `tasks/`, `decisions/`, `releases/` | Empty | Hold only `.gitkeep`; `plans/`/`tasks/` unblock only after Gate 1 Approved |
 | `SRS.md`, `architecture.md`, `inventory/`, `templates/`, `source-docs/README.md`, `source-docs/proposal-extract.md`, `.agent/rules/int-standards.node.md` | **Removed 2026-09-04** | Empty Floor content, confirmed unneeded after Day 2 review; context preserved outside the repo, not in these files |
@@ -165,3 +165,37 @@ earlier point and is now corrected everywhere it appeared (`status.md`, `prompt_
 the author and is recorded as Gate 1 Reviewer in the spec's Gate 1 Review block and in the
 Programme status table above. Gate 1 is still **not** Approved — this only assigns the reviewer;
 the reviewer's actual decision is a separate, later step.
+
+## Day 4 execution log — 2026-09-15
+
+- Gate 1 Reviewer Sourav Kumar Maity provided a manual review of `BRD.md#BRD-001` and
+  `specs/emp-internal-transfer.spec.md`, to be recorded verbatim rather than paraphrased or
+  silently resolved.
+- Recorded the full review (overall assessment, strengths, seven numbered observations, and
+  recommendation) in `specs/emp-internal-transfer.spec.md`'s Gate 1 Review section, dated
+  2026-09-15.
+- Recorded decision: **`PASS WITH CONDITIONS`** — the reviewer's own wording, not one of the two
+  states (`Approved` / `Changes Requested`) the spec's Gate 1 Review block defines. Recorded as-is,
+  not mapped onto either state; flagged in the spec for the developer/reviewer to confirm whether a
+  third decision state should be formalised. For gating purposes only, treated as **not yet
+  Approved** — `plans/`/`tasks/` remain blocked per the Baseline artefacts table below.
+- Cross-referenced the reviewer's seven observations against existing tracked items:
+  conditional-downstream-activities (obs. 1) → **Q07**; rejection/failure handling (obs. 2) →
+  **Q08**; stakeholder ownership of org-info (obs. 4) → **Q06**; RBAC (obs. 5) → **Q11** and the
+  BRD's "assume employee + manager + HR only" working-assumption note. Two observations do not map
+  to an existing Q-item and are flagged in the spec for the author to consider as new BRD open
+  items: Manager→HR sequencing as an enforced state-machine rule vs. source-list ordering
+  (obs. 3), and the business rule/source for valid department/location/role options (obs. 6).
+  Observation 7 (submission vs. completion confirmation) is noted as partially covered by
+  AC01/AC11 but not yet named as two distinct confirmation events.
+- Updated spec `Status` to `Gate 1 — Pass with Conditions (revision required before re-review)` and
+  the Programme status / Active specs tables above accordingly.
+- Did **not** revise the BRD's Open Decisions table or the spec's acceptance criteria — that is the
+  developer's follow-up in response to this review, not part of recording it.
+- No `.plan.md`, `.tasks.md`, migration, controller, service, React component, or production code
+  was created.
+
+**Next:** Developer (Aditya Hazra) revises `BRD.md`/`specs/emp-internal-transfer.spec.md`
+addressing the four focus areas the reviewer named (conditional downstream workflow,
+rejection/failure handling, Manager/HR sequencing, authorization and stakeholder ownership), then
+resubmits for another Gate 1 pass.

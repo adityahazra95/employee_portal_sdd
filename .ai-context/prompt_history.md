@@ -841,3 +841,29 @@ session).
 **Follow-up:** Gate 1 is **not** Approved by this entry — only the reviewer assignment and the
 author-name correction are recorded. The reviewer's actual Gate 1 decision (Approved / Changes
 Requested) is a separate, later step, to be recorded when Sourav Kumar Maity provides it.
+
+### 2026-09-15 — emp-internal-transfer.Day4.gate1-review
+
+**Prompted by:** Sourav Kumar Maity (Gate 1 Reviewer)
+**Instruction (summary):** Recorded the reviewer's own manual Gate 1 review comments against
+`BRD.md#BRD-001` and `specs/emp-internal-transfer.spec.md` — an overall assessment, strengths,
+seven numbered observations/clarifications, a recommendation, and a decision of
+`PASS WITH CONDITIONS`.
+**Artefacts touched:** `specs/emp-internal-transfer.spec.md` (Gate 1 Review section expanded with
+full review text and review date; `Status` field updated), `status.md` (Programme status, Active
+specs table, new Day 4 execution log), `prompt_history.md` (this entry).
+**Outcome:** Review recorded verbatim rather than paraphrased. `PASS WITH CONDITIONS` is not one of
+the two decision states (`Approved`/`Changes Requested`) the spec's Gate 1 block defines — recorded
+as-is, not silently mapped onto either, with a note asking the developer/reviewer to confirm
+whether a third state should be formalised. For gating purposes (unblocking `plans/`/`tasks/`),
+treated as **not yet Approved** pending a revision. Cross-referenced four of the seven observations
+to existing open items (conditional downstream activities → Q07; rejection/failure handling → Q08;
+org-info stakeholder ownership → Q06; RBAC → Q11); two observations (Manager→HR sequencing as an
+enforced rule; the business rule for valid department/location/role options) do not map to an
+existing Q-item and are flagged in the spec for the author to consider as new BRD open items;
+one observation (submission vs. completion confirmation) is noted as partially covered by
+AC01/AC11. No tests run; no code, `.plan.md`, or `.tasks.md` created; the BRD's Open Decisions table
+and the spec's acceptance criteria were not themselves revised — that is the developer's follow-up.
+**Follow-up:** Developer (Aditya Hazra) to revise BRD/spec addressing the reviewer's four focus
+areas (conditional downstream workflow, rejection/failure handling, Manager/HR sequencing,
+authorization/stakeholder ownership), then resubmit for another Gate 1 pass.

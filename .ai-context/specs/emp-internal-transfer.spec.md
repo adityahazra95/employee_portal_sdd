@@ -4,14 +4,109 @@
 `emp-internal-transfer`
 
 ## Status
-`In Peer Review (Gate 1)`
+`Gate 1 — Pass with Conditions (revision required before re-review)`
 
 ## Gate 1 Review
-**Author:** Aditya Hazra (SDD Developer) · **Gate 1 Reviewer:** Sourav Kumar Maity · **Review Date:** —
+**Author:** Aditya Hazra (SDD Developer) · **Gate 1 Reviewer:** Sourav Kumar Maity · **Review Date:** 2026-09-15
 
 The reviewer is not the author. This spec is not Approved until the reviewer above records a
 Gate 1 decision (Approved / Changes Requested) against the acceptance criteria, API contract, and
 open decisions in this document.
+
+**Recorded decision: `PASS WITH CONDITIONS`.** This is the reviewer's own wording, not one of the
+two decision states this section otherwise defines. It is recorded verbatim below rather than
+silently mapped onto "Approved" or "Changes Requested" — per this project's discovery rule, an
+ambiguous input is recorded as-is, not resolved on its behalf. For gating purposes, since
+conditions remain outstanding, this spec is **not yet Approved**: `plans/`/`tasks/` remain blocked
+(per `status.md`'s Baseline artefacts table) until a revised spec addressing the conditions below
+goes through another Gate 1 pass. The reviewer and/or developer should confirm whether "Pass with
+Conditions" should be formalised as a third decision state for this project, or whether future
+reviews should pick between the existing two.
+
+### Gate 1 Review Comments — Sourav Kumar Maity, 2026-09-15
+
+Recorded as provided by the reviewer, reviewing `BRD.md#BRD-001` and this spec together.
+
+**Overall assessment:** The BRD/spec demonstrate a good understanding of the Employee Internal
+Transfer journey and follow the SDD discovery approach well — business objectives, actors, journey
+stages, assumptions, dependencies, open questions, and the business/technical decision split are
+all appropriately identified. The identification of ambiguities is particularly good; several
+unspecified areas are correctly left open rather than silently converted into confirmed business
+rules.
+
+**Key strengths noted:**
+- Good understanding of the business journey — employee/manager/HR/downstream-stakeholder
+  responsibilities and the major journey stages are captured correctly; employee-facing
+  capabilities align with the source requirement.
+- Good ambiguity and discovery analysis — missing business decisions are identified rather than
+  assumed; questions around eligibility, effective date, concurrent requests, downstream
+  activities, rejection, RBAC, and integrations are appropriately raised.
+- Clear business vs. technical distinction — API, data model, orchestration mechanism, and
+  technology choices are correctly treated as technical concerns.
+- Good traceability foundation — requirements trace back to the source assessment document,
+  giving a reasonable base for Spec → Acceptance Criteria → API Contract → Test Cases → Technical
+  Plan.
+
+**Observations / required clarifications before the spec is fully ready for the next SDD stage:**
+
+1. **Conditional downstream activities — Critical.** The requirement states Payroll, IT, and
+   Facilities activities apply "only where required," without a business rule for *when* each
+   applies (when is Payroll involvement required; when is IT provisioning/removal required; when
+   is Facilities involvement required). The specification must not invent these rules without
+   business confirmation. *(Maps to the existing open item [Q07](../BRD.md); AC10/AC11.)*
+2. **Rejection and failure handling — Critical.** Define the expected business behaviour for:
+   manager rejection, HR rejection, a failed Payroll update, a failed IT provisioning/removal, and
+   a Facilities activity that cannot be completed — and whether a downstream failure results in a
+   failed request, a pending/manual-intervention state, a retry, an escalation, or another
+   business-defined outcome. Resulting state transitions must be based on confirmed business
+   decisions, not technical assumptions. *(Maps to the existing open item [Q08](../BRD.md);
+   AC07/AC09.)*
+3. **Manager → HR sequencing.** The BRD/spec interpret the journey as Employee → Manager → HR →
+   Downstream activities. Confirm explicitly whether HR validation must happen only after manager
+   approval, or whether Manager and HR activities can happen in parallel — the source presents
+   them sequentially, but this should be treated as a business rule needing confirmation if it
+   affects the state machine. *(Not fully covered by an existing Q-item — BRD.md's "Business
+   decisions" section currently states sequential order as decided from the source's step
+   ordering, line 104-105; the reviewer's point is that "sequential in the source's list" and
+   "sequential as an enforced state-machine rule, with parallel explicitly ruled out" are not
+   necessarily the same confirmed decision. Flagged for the author to consider as a BRD
+   clarification/new open item.)*
+4. **Stakeholder ownership.** The organisational-information update is a journey stage but its
+   responsible stakeholder/team is not clearly identified: who owns it, is it HR or another team,
+   and should it appear as a separate stakeholder/action in the employee's "pending with" view?
+   *(Maps to the existing open item [Q06](../BRD.md); AC10.)*
+5. **Authorization / RBAC.** Good that RBAC is already an open question ([Q11](../BRD.md)) — avoid
+   treating Employee + Manager + HR as a confirmed access model unless explicitly approved (see
+   `BRD.md`'s Authorization/RBAC section, which currently frames it as a working assumption
+   pending confirmation, not a decision). Clarify who can view the request, approve/reject it,
+   perform downstream actions, and view requests across employees (if applicable).
+6. **Department / Location / Role data.** The employee selects department/business unit, location,
+   and role/job position — identify the business rule/source determining which values are
+   valid/selectable. Technical implementation of the source can be decided later, but the business
+   definition of valid options should be clear before finalising the specification. *(Not covered
+   by an existing Q-item; overlaps this spec's "Contract Gaps" reference-data-endpoint gap, but
+   that gap is framed as a technical/API question — this observation is about the underlying
+   business rule for valid options, which is a distinct, currently untracked gap. Flagged for the
+   author to consider as a new BRD open item.)*
+7. **Employee confirmation.** Clarify what "employee receives confirmation" means in the final
+   journey — immediately after submission, after manager approval, after HR approval, or only
+   after all applicable downstream activities complete. The final specification should
+   distinguish submission confirmation from transfer-completion confirmation, if both are
+   required. *(Partially covered: AC01 already asserts a submission-time status view and AC11 a
+   completion-time confirmation, but the spec does not yet explicitly frame these as two distinct,
+   named confirmation events. Flagged for the author to consider as a BRD/spec clarification.)*
+
+**Recommendation for next revision:** focus particularly on (1) conditional downstream workflow,
+(2) rejection/failure handling, (3) manager/HR sequencing, and (4) authorization and stakeholder
+ownership. Where a business decision is not available, retain it explicitly as an Open
+Decision/Assumption rather than creating an implicit rule. Once addressed, the specification can
+proceed to the next SDD stage with a stronger foundation for Spec → Acceptance Criteria → API
+Contract → Test Cases → Technical Plan.
+
+**Gate 1 decision (reviewer's words):** PASS WITH CONDITIONS — "The submission demonstrates good
+SDD discovery capability and a strong understanding of the business journey. Approval is
+conditional on addressing the above workflow and authorization ambiguities before proceeding to
+detailed implementation planning."
 
 ## Linked BRD
 [`.ai-context/BRD.md#brd-001-employee-internal-transfer-digital-journey`](../BRD.md#brd-001-employee-internal-transfer-digital-journey)
