@@ -1,6 +1,6 @@
 # Project Status Board
 
-_Last updated: 2026-09-30 — updated by: Aditya Hazra (Developer)_
+_Last updated: 2026-09-30 — updated by: Sourav Kumar Maity (Gate 1 Reviewer)_
 
 Single source of truth for **what is happening right now**. Updated the same day by whoever last
 touched an artefact.
@@ -19,16 +19,16 @@ touched an artefact.
 | Item | State |
 |---|---|
 | Feature | `emp-internal-transfer` — Employee Internal Transfer Digital Journey |
-| Stage | **BRD: Gate 1 PASS (2026-09-30)** · Spec: **Draft v1.2.1 — In Peer Review (Gate 1 re-review)** |
+| Stage | **BRD: Gate 1 PASS (2026-09-30)** · Spec: **Approved — Gate 1 (v1.2.1, 2026-09-30)** |
 | Owner | Developer (Aditya Hazra) |
 | Gate 1 Reviewer | **Sourav Kumar Maity** |
-| SDD chain position | Day 4 (Gate 1 review + fix cycles) — v1.2.1 fixes Part 4's P4-01…P4-09; awaiting the reviewer's decision before Day 5 (Technical Plan) |
+| SDD chain position | Day 4 (Gate 1) **complete — spec Approved 2026-09-30**; Day 5 (Technical Plan) unblocked |
 
 ## Active specs
 
 | Spec ID | Title | Status | Owner | Last Updated | Notes |
 |---|---|---|---|---|---|
-| `emp-internal-transfer` | Employee Internal Transfer Digital Journey | **Draft v1.2.1 — In Peer Review (Gate 1 re-review)** | Developer | 2026-09-30 | Part 4 re-review (Changes Requested, minor) listed P4-01…P4-09; v1.2.1 fixes all nine. `hr_approved` is no longer a returned value or expected result anywhere (API02, UT05, UT10, STATE-03/05); API03 states its result per action; API04 accepts `pending_resolution` steps, so that state has an exit (AC18/UT18 aligned); `pendingWith` multi-step point recorded as a Contract Gap; test-cases file brought up to v1.2.1 (18/18/API01–API04, new API04 and `pending_resolution` scenarios). **Reviewer:** start at "Revision Notes v1.2.1" in the spec — one row per item plus a ticked self-check against your Part 4 checklist. **Next:** Sourav Kumar Maity re-reviews v1.2.1 |
+| `emp-internal-transfer` | Employee Internal Transfer Digital Journey | **Approved — Gate 1 (v1.2.1, 2026-09-30)** | Developer | 2026-09-30 | Part 4 re-review (Changes Requested, minor) listed P4-01…P4-09; v1.2.1 fixes all nine. `hr_approved` is no longer a returned value or expected result anywhere (API02, UT05, UT10, STATE-03/05); API03 states its result per action; API04 accepts `pending_resolution` steps, so that state has an exit (AC18/UT18 aligned); `pendingWith` multi-step point recorded as a Contract Gap; test-cases file brought up to v1.2.1 (18/18/API01–API04, new API04 and `pending_resolution` scenarios). **Reviewer:** start at "Revision Notes v1.2.1" in the spec — one row per item plus a ticked self-check against your Part 4 checklist. **Next:** Sourav Kumar Maity re-reviews v1.2.1 **Gate 1 Approved 2026-09-30 (Part 5, Sourav Kumar Maity).** **Next:** Day 5 Technical Plan |
 
 ## Baseline artefacts
 
@@ -39,9 +39,9 @@ touched an artefact.
 | `BRD.md` | **Gate 1 PASS — 2026-09-30** (BRD-001) | Seeded from `source-docs/Requirement for SDD.docx`; open questions Q01–Q13 recorded, none silently resolved; controlled assumptions for Q07/Q08/Q05 (Q05 added in the v1.2 fix cycle). Final review recorded verbatim at the end of the file; carry-forward Q06, Q07/Q08, Q11, Q12, Q13 |
 | `.agent/rules/int-standards.laravel.md` | Created | Defaults only — no Laravel code exists in this repo yet to verify against |
 | `.agent/rules/int-standards.nextjs.md` | Created | Defaults only — no Next.js code exists in this repo yet to verify against |
-| `specs/emp-internal-transfer.spec.md` | **Draft v1.2.1 — In Peer Review (Gate 1 re-review)** | AC01–AC18, full API contract (API01–API04, `pending_resolution` step status with a defined exit), error contract, Next.js consumer contract, UT01–UT18, full traceability; all four Gate 1 review passes preserved verbatim plus revision notes for v1.1, v1.2 and v1.2.1 |
+| `specs/emp-internal-transfer.spec.md` | **Approved — Gate 1 (v1.2.1, 2026-09-30)** | AC01–AC18, full API contract (API01–API04, `pending_resolution` step status with a defined exit), error contract, Next.js consumer contract, UT01–UT18, full traceability; all four Gate 1 review passes preserved verbatim plus revision notes for v1.1, v1.2 and v1.2.1 |
 | `test_cases/emp-internal-transfer.test_cases.md` | Updated for v1.2.1 | Broader QA scenarios: API, validation/boundary, auth/RBAC, state-transition, concurrency, contract, Next.js consumer, UI states, accessibility, cross-browser, regression. v1.2.1 added `AUTH-09`/`10`, `STATE-09`…`13`, `FE-09` (API04 and `pending_resolution`) |
-| `plans/`, `tasks/`, `decisions/`, `releases/` | Empty | Hold only `.gitkeep`; `plans/`/`tasks/` unblock only after Gate 1 Approved |
+| `plans/`, `tasks/`, `decisions/`, `releases/` | Empty | Hold only `.gitkeep`. **`plans/` unblocked** (Gate 1 Approved 2026-09-30); `tasks/` follows once the Day 5 plan is reviewed |
 | `.ai-context/templates/` | Present — 6 files | Restored 2026-09-30; the two that carried prior-project content (`spec.template.md`, `plan.template.md`) rewritten from the Blueprint's own §11.4/§29 canonical skeletons; two minor stale file-path references cleaned in `release.template.md`/`tasks.template.md`. The other four (`adr`, `hotfix-spec`, `release`, `tasks`) were already generic |
 | `.ai-context/inventory/` | Empty (`.gitkeep` only) | Not part of the Blueprint's canonical `.ai-context/` structure (§15) — was prior-project discovery output (an existing codebase's module/API/DB inventory on a different stack); removed again 2026-09-30 after being reintroduced, since there's no code in this repo yet to inventory |
 | `.agent/workflows/` | Authored 2026-09-30 | `generate-plan.md`, `generate-tests.md`, `code-review.md` — mandated by Blueprint §15 but missing since the 2026-09-04 cleanup accidentally took the folder itself along with its prior-project-specific content; rebuilt fresh, Laravel/Next.js-neutral |
@@ -431,3 +431,23 @@ AC/API/UT renumbered. No `.plan.md`, `.tasks.md` or production code created.
 
 **Next:** Resubmit v1.2.1 to Sourav Kumar Maity. If he records **Approved**, `plans/`/`tasks/`
 unblock and Day 5 (Technical Plan) can begin.
+
+## Gate 1 final review (Part 5) — spec v1.2.1 — 2026-09-30 — **APPROVED**
+
+- Gate 1 Reviewer Sourav Kumar Maity reviewed `specs/emp-internal-transfer.spec.md` v1.2.1
+  (commit `209e9f3`). Every Part 4 approval-checklist item was verified independently against the
+  spec and test-cases text. All six pass. Decision: **`Approved`**, recorded as "Gate 1 Review
+  Comments (Part 5 — v1.2.1 final review)". It supersedes all earlier Gate 1 decisions.
+- Non-blocking editorial note: Context still says "11 open items (Q01–Q11)". Fix it in the next
+  spec revision.
+- Carried into Day 5, all to stay explicit there:
+  - Open: Q06, Q11, Q12, Q13.
+  - Controlled assumptions to validate: Q05, Q07, Q08.
+  - Contract gaps: `pending_resolution` entry mechanism, `pendingWith` with several steps
+    pending, reference-data endpoints, downstream-actor identity mapping.
+  - `[Open]` stack decisions: auth mechanism, rate limits, test frameworks.
+- No `.plan.md`, `.tasks.md` or production code was created in this entry.
+
+**Next:** Day 5, the Technical Plan (`plans/emp-internal-transfer.plan.md`), authored by the
+developer against the Approved spec. It needs its own review before `tasks.md` is derived, and
+tests are written and confirmed failing before any implementation.

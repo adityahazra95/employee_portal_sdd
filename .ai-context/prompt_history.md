@@ -350,3 +350,16 @@ Gap. Same-class extras fixed and disclosed: FE-03 status count, four-endpoint re
 garbled CONC-02 sentence. "Revision Notes v1.2.1" added with a row per item and a checklist
 self-check. No AC/API/UT renumbered. No tests run; no plan, tasks or production code.
 **Follow-up:** Resubmit v1.2.1 to Sourav Kumar Maity for the Gate 1 decision.
+
+### 2026-09-30 — emp-internal-transfer.gate1-approved
+**Prompted by:** Sourav Kumar Maity (Gate 1 Reviewer)
+**Instruction (summary):** Review spec v1.2.1, update the Gate 1 reviewer comments, and approve.
+**Artefacts touched:** `.ai-context/specs/emp-internal-transfer.spec.md`, `.ai-context/status.md`,
+`.ai-context/prompt_history.md`
+**Outcome:** Verified all six Part 4 checklist items against the v1.2.1 text (commit `209e9f3`);
+all pass. Recorded the Part 5 review with decision **Approved**: spec Status line and Gate 1
+decision line set to Approved, a reviewer-verification evidence table, carry-forward items for
+Day 5, and one non-blocking editorial note (the stale "Q01–Q11" count in Context). The status
+board now shows Gate 1 complete and `plans/` unblocked. No tests were run (documentation-only
+change).
+**Follow-up:** Day 5 Technical Plan. Fix the Context Q01–Q13 wording in the next spec revision.

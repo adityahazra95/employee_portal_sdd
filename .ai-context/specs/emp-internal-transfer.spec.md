@@ -4,10 +4,16 @@
 `emp-internal-transfer`
 
 ## Status
-`Draft v1.2.1 — In Peer Review (Gate 1 re-review)`
+`Approved — Gate 1 (v1.2.1, 2026-09-30)`
 
 ## Gate 1 Review
-**Author:** Aditya Hazra (SDD Developer) · **Gate 1 Reviewer:** Sourav Kumar Maity · **Review Date:** 2026-09-15
+**Author:** Aditya Hazra (SDD Developer) · **Gate 1 Reviewer:** Sourav Kumar Maity · **Review Date:** 2026-09-15 (first pass) · 2026-09-30 (final)
+
+**Gate 1 decision: `Approved`** — Sourav Kumar Maity, 2026-09-30, against v1.2.1 (commit `209e9f3`).
+This supersedes every earlier decision recorded in this section (`PASS WITH CONDITIONS`,
+`PASS WITH MINOR CONDITIONS`, `Changes Requested (minor)`). See "Gate 1 Review Comments (Part 5 —
+v1.2.1 final review)" just before "Linked BRD". The spec may now proceed to the Day 5 Technical
+Plan; `plans/` is unblocked, and `tasks/` follows once the plan is reviewed.
 
 The reviewer is not the author. This spec is not Approved until the reviewer above records a
 Gate 1 decision (Approved / Changes Requested) against the acceptance criteria, API contract, and
@@ -36,6 +42,9 @@ open decisions in this document.
 > Part 4 review below: one row per item, a few same-class extras found while fixing them, and a
 > line-by-line check against the Part 4 approval checklist. Status bumped to `Draft v1.2.1`. Still
 > **not Approved** until the reviewer records it.
+>
+> **2026-09-30 — v1.2.1 final review (Part 5): `Approved`.** The reviewer independently verified
+> every Part 4 checklist item against the text. See Part 5 below.
 
 ### Reviewer guidance for the v1.2 re-review (author's request, 2026-09-30)
 
@@ -477,6 +486,53 @@ test-cases file hadn't been updated since Day 3. P4-07 fixed a real logic hole v
 - [x] A "Revision Notes v1.2.1" row exists for each of P4-01…P4-09.
 
 These ticks are the author's self-check. The Gate 1 decision is still the reviewer's.
+
+### Gate 1 Review Comments (Part 5 — v1.2.1 final review) — Sourav Kumar Maity, 2026-09-30
+
+**Decision: `Approved`.**
+
+I have reviewed v1.2.1 (commit `209e9f3`) against the Part 4 approval checklist, checking each item
+against the text of the spec and `test_cases/emp-internal-transfer.test_cases.md` rather than
+relying on the author's self-check.
+
+**Checklist verification (reviewer):**
+
+| Checklist item | Result | Evidence |
+|---|---|---|
+| `hr_approved` never a returned value or expected test result | ✅ Pass | Remaining occurrences are only the status vocabulary row and its v1.1 note, review/revision text, and explicit "never `hr_approved`" assertions (API03 result table, UT05, UT08, STATE-03, FE-03). API02's `status` enumeration no longer contains it (P4-01) |
+| AC08, API03 HR-approve result, UT05, UT08, STATE-03 agree | ✅ Pass | All state `downstream_processing` (≥1 step applies) or `completed` (none apply) |
+| 18 ACs / 18 UTs / API01–API04 consistent in both files | ✅ Pass | Unit Test intro, status vocabulary intro, Next.js contract, test-cases intros (`UT01`–`UT18`, `API01`–`API04`). Remaining 17/API01–API03 mentions are explicitly historical |
+| `pending_resolution` has a defined exit; both gaps recorded | ✅ Pass | API04 accepts `pending` or `pending_resolution` (P4-07), carried into AC18 and UT18. Contract Gaps records both the entry mechanism and the `pendingWith` multi-step point (P4-09) |
+| Q05/Q07/Q08 controlled assumptions; Q06/Q11/Q12/Q13 open | ✅ Pass | Open Decisions table and `BRD.md` Controlled Assumptions |
+| Revision Notes row for each P4 item | ✅ Pass | "Revision Notes v1.2.1": P4-01…P4-09, plus same-class extras |
+
+Also confirmed: the AC11 traceability row runs through AC18/API04 and AC08/API03 (zero-step
+branch); `STATE-12`/`STATE-13` and `FE-09` cover `pending_resolution`; and v1.2.1 introduces no new
+business rule.
+
+**Non-blocking editorial note (fix in the next spec revision; it does not affect approval):**
+Context still says "11 open items (Q01–Q11)". It should say Q01–Q13, with Q05/Q07/Q08 labelled
+controlled assumptions.
+
+**Carried forward into the Day 5 Technical Plan.** These must stay explicit there, not be
+silently resolved:
+
+- **Open business decisions:** Q06 (org-info ownership), Q11 (RBAC/delegation, including
+  downstream actors), Q12 (Manager→HR sequencing; strict sequencing is the working assumption),
+  Q13 (selectable department/location/role source).
+- **Controlled assumptions, to be validated before production behaviour is final:** Q05
+  (domestic-only), Q07 (downstream applicability), Q08 (terminal rejection; `pending_resolution`
+  for a failed step).
+- **Contract gaps for the plan to resolve:** the mechanism by which a step enters
+  `pending_resolution`; which step `pendingWith` names when several are pending; reference-data
+  endpoints; downstream-actor identity mapping.
+- **Proposed specification decisions confirmed at Gate 1:** the `/api/v1/transfer-requests` base
+  path, the error envelope, and the 403-vs-404 split are accepted as the contract. Auth mechanism,
+  rate limits and test frameworks remain `[Open]` Day 5 decisions per the stack rule files.
+
+Gate 1 is closed for `emp-internal-transfer`. Day 5 may begin. Per the constitution, the plan
+still needs its own review before `tasks.md` is derived, and tests must be written and confirmed
+failing before implementation.
 
 ## Linked BRD
 [`.ai-context/BRD.md#brd-001-employee-internal-transfer-digital-journey`](../BRD.md#brd-001-employee-internal-transfer-digital-journey)
