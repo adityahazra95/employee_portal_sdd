@@ -4,7 +4,7 @@
 `emp-internal-transfer`
 
 ## Status
-`Draft v1.2 — In Peer Review (Gate 1 re-review)`
+`Draft v1.2 — Gate 1 re-review (Part 4, 2026-09-30): Changes Requested (minor) — fix items P4-01…P4-09, resubmit as v1.2.1`
 
 ## Gate 1 Review
 **Author:** Aditya Hazra (SDD Developer) · **Gate 1 Reviewer:** Sourav Kumar Maity · **Review Date:** 2026-09-15
@@ -25,6 +25,12 @@ open decisions in this document.
 > **2026-09-30 — v1.2 addresses all six conditions.** See "Revision Notes v1.2" immediately after
 > Part 3 below for the point-by-point disposition. Status bumped to `Draft v1.2`. Still **not yet
 > Approved** — that requires the reviewer's own decision, not a self-declaration.
+>
+> **2026-09-30 — v1.2 re-review (Part 4) returned `Changes Requested (minor)`.** Recorded as
+> "Gate 1 Review Comments (Part 4 — v1.2 re-review)" just before "Linked BRD". It lists nine
+> mechanical consistency items (P4-01…P4-09) and answers the four questions in the reviewer
+> guidance below. It uses the binary Blueprint §12.3 decision state, not a "pass with conditions"
+> label. Once the items are fixed and verified, the next decision will be a plain `Approved`.
 
 ### Reviewer guidance for the v1.2 re-review (author's request, 2026-09-30)
 
@@ -383,6 +389,54 @@ genuinely new modeling decision, made explicitly and narrowly rather than silent
 | 5 🟡 Q05 not a labelled controlled assumption | **Fixed** — `BRD.md`'s Controlled Assumptions section now includes Q05 (domestic-only for v1.2); this spec's Open Decisions row and Out of Scope wording both now say "controlled assumption," not "excluded by default" |
 | *(self-caught, not one of the reviewer's six)* — `UT12` scenario still said "non-completed status" | **Fixed** — `AC12` was already widened to cover every state in v1.1, but `UT12` was left stale, same class of defect as condition 1. Caught while re-checking the file for this fix cycle and corrected; `UT13`'s wording also aligned to "non-terminal" for precision |
 | 6 🟡 No `pending_resolution` representation | **Modeled, with an honest new gap flagged** — `stages[].steps[].status` gains a `pending_resolution` value (a per-step detail, not a new top-level `status`, since a stuck step doesn't change the overall request's `downstream_processing` state). **New Contract Gap added:** no endpoint yet lets a downstream stakeholder actually report a step as unable to complete — only API04's "mark complete" exists. Adding *that* mechanism now would mean inventing a business process the BRD's Q08 assumption doesn't specify in enough detail (who decides "cannot be completed," on what basis, whether it's automatic or manual) — narrower to represent the *value* so the contract is honest about the state existing, and flag the *producing mechanism* as a Day 5 gap, than to invent an endpoint/workflow unprompted. |
+
+### Gate 1 Review Comments (Part 4 — v1.2 re-review) — Sourav Kumar Maity, 2026-09-30
+
+**Decision: `Changes Requested (minor)`.** v1.2 correctly resolves the substance of all six Part 3
+conditions, including the design choice for condition 6. A few items were fixed in one place but
+left stale in others, and the test-cases file wasn't updated at all. The main problem is that
+**UT05 and UT08 currently expect different results for the same HR approve action**. Under the
+test-first rule, approving now would carry that contradiction straight into the first failing
+tests. No redesign is required. All items below are mechanical, and once they are fixed and
+verified the next decision will be **`Approved`**.
+
+**Answers to the author's reviewer-guidance questions:**
+
+1. **Condition 6 approach:** **accepted.** `pending_resolution` as a per-step value, with the
+   request staying `downstream_processing`, is the right minimal representation of the Q08
+   assumption. Keeping the *setting* mechanism as a Contract Gap is acceptable for Gate 1 and must
+   be resolved by the Day 5 technical plan. Its *exit* is not yet defined, though (see P4-07).
+2. **UT12/UT13 self-caught fix:** **confirmed correct and in scope.**
+3. **"PASS WITH (MINOR) CONDITIONS":** **not formalised.** Gate 1 decisions stay binary per
+   Blueprint §12.3: `Approved` / `Changes Requested`. This review and all future ones use those
+   two states only.
+4. **Spot-check of the six fix locations:** done. The findings are below.
+
+**Items to fix (resubmit as v1.2.1):**
+
+| ID | Location | Required change |
+|---|---|---|
+| P4-01 | Spec — API02 success payload, `status` enumeration | Remove `hr_approved`. It is transient and never returned, per the status vocabulary and UT08. It should read `submitted \| manager_approved \| manager_declined \| hr_declined \| downstream_processing \| completed` |
+| P4-02 | Spec — UT05 Expected | Replace "status becomes `hr_approved` or `hr_declined`" with "`downstream_processing` or `completed` on approve (see UT08), or `hr_declined` on decline; never `hr_approved`" |
+| P4-03 | Spec — UT10 Scenario | "GET API02 on a `downstream_processing` request with applicable downstream steps" (an `hr_approved` request cannot exist) |
+| P4-04 | Test cases — intro (line 6) and §1 intro (line 17) | `UT01`–`UT17` → `UT01`–`UT18`; `API01`–`API03` → `API01`–`API04` |
+| P4-05 | Test cases — `STATE-03` | Expected: "`downstream_processing` (≥1 step applies) or `completed` (none apply; stubbed per UT08); never `hr_approved`" |
+| P4-06 | Test cases — `STATE-05` | Starting state `downstream_processing`; the last applicable step is completed via API04 → `completed`, `pendingWith: none`; map to AC11, AC18 |
+| P4-07 | Spec — API04 path parameter (currently "must be a step … in `pending` status") | Also accept steps in `pending_resolution`, so the responsible stakeholder can complete a step once it has been resolved outside the system. Without this, a step in `pending_resolution` has no exit and the request can never reach `completed` (AC11). This defines the exit only; the entry mechanism stays a Contract Gap. Reflect it in UT18 (parameterise over prior step status `pending` / `pending_resolution`) |
+| P4-08 | Test cases — new rows | (a) Completing a `pending_resolution` step via API04 → step `complete`, request `completed` if it was the last applicable step. (b) A **gap scenario** for entering `pending_resolution`, not testable until the mechanism is defined; while a step is in `pending_resolution` the request must stay `downstream_processing`. Optionally add API04 authorization scenarios (wrong stakeholder → `403`, step not applicable → `404`) alongside the existing AUTH rows |
+| P4-09 | Spec — Contract Gaps | Record that `pendingWith` is single-valued while several downstream steps can be pending at once. Which one it names is undefined; `stages[].steps[]` is the authoritative per-step view. Record it as a gap; this does not block approval |
+
+**Approval checklist for v1.2.1 (the reviewer will verify):**
+
+- [ ] `hr_approved` appears only in the status vocabulary and historical/review text, never as a
+      returned value or an expected test result.
+- [ ] AC08, API03's HR-approve result, UT05, UT08 and STATE-03 all state the same post-HR-approval
+      state.
+- [ ] 18 ACs / 18 UTs / API01–API04 are stated consistently in the spec and test-cases file.
+- [ ] A `pending_resolution` step has a defined exit (API04), and both the entry mechanism and the
+      `pendingWith` multi-step point are recorded as Contract Gaps.
+- [ ] Q05, Q07 and Q08 are labelled controlled assumptions; Q06, Q11, Q12 and Q13 remain open.
+- [ ] A "Revision Notes v1.2.1" row exists for each of P4-01…P4-09.
 
 ## Linked BRD
 [`.ai-context/BRD.md#brd-001-employee-internal-transfer-digital-journey`](../BRD.md#brd-001-employee-internal-transfer-digital-journey)

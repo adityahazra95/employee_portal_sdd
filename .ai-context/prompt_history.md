@@ -317,3 +317,18 @@ line — only Q05 changed), `status.md` (pointer in the Active specs row + execu
 skip. Uses section names, not line numbers, since those shift. No spec content, AC, API, or UT
 changed. Documentation-only.
 **Follow-up:** Commit/push when ready, then resubmit to Sourav Kumar Maity.
+
+### 2026-09-30 — emp-internal-transfer.gate1-part4-review
+**Prompted by:** Sourav Kumar Maity (Gate 1 Reviewer)
+**Instruction (summary):** Review the author's spec v1.2 against the Part 3 conditions, recommend
+the path to approval, and record it as the Part 4 review.
+**Artefacts touched:** `.ai-context/specs/emp-internal-transfer.spec.md`, `.ai-context/status.md`,
+`.ai-context/prompt_history.md`
+**Outcome:** Recorded Part 4 as **Changes Requested (minor)**: nine mechanical items (P4-01…P4-09),
+answers to the author's four reviewer-guidance questions, and an approval checklist for v1.2.1.
+Spec Status line and Gate 1 pointer note updated; status board updated. A conflicting local
+reviewer-authored v1.2 commit was not pushed. It is kept only on the local branch
+`backup/reviewer-v1.2-edits`, and the author's merged v1.2 (PR #2) is kept as the record. No
+tests were run (documentation-only change).
+**Follow-up:** Author resubmits v1.2.1 fixing P4-01…P4-09; the reviewer then verifies and records
+Approved.

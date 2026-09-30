@@ -1,6 +1,6 @@
 # Project Status Board
 
-_Last updated: 2026-09-30 — updated by: Aditya Hazra (Developer)_
+_Last updated: 2026-09-30 — updated by: Sourav Kumar Maity (Gate 1 Reviewer)_
 
 Single source of truth for **what is happening right now**. Updated the same day by whoever last
 touched an artefact.
@@ -19,16 +19,16 @@ touched an artefact.
 | Item | State |
 |---|---|
 | Feature | `emp-internal-transfer` — Employee Internal Transfer Digital Journey |
-| Stage | **BRD: Gate 1 PASS (2026-09-30)** · Spec: **Draft v1.2 — In Peer Review (Gate 1 re-review)** |
+| Stage | **BRD: Gate 1 PASS (2026-09-30)** · Spec: **Draft v1.2 — Gate 1 (Part 4): Changes Requested (minor)** |
 | Owner | Developer (Aditya Hazra) |
 | Gate 1 Reviewer | **Sourav Kumar Maity** |
-| SDD chain position | Day 4 (Gate 1 review + revision + fix cycle) complete; awaiting Sourav's v1.2 re-review before Day 5 (Technical Plan) |
+| SDD chain position | Day 4 (Gate 1 review + revision + fix cycle) complete; v1.2 re-reviewed: Changes Requested (minor), 9 mechanical items P4-01…P4-09; v1.2.1 then Approved before Day 5 (Technical Plan) |
 
 ## Active specs
 
 | Spec ID | Title | Status | Owner | Last Updated | Notes |
 |---|---|---|---|---|---|
-| `emp-internal-transfer` | Employee Internal Transfer Digital Journey | **Draft v1.2 — In Peer Review (Gate 1 re-review)** | Developer | 2026-09-30 | v1.2 fixes all six conditions from Sourav's Part 3 re-review: `UT08`'s expected status corrected; `AC11` traceability now shows `AC18`/`API04`/`UT18`; stale "17 AC/17 UT/API01–API03" references corrected to 18/18/API01–API04 throughout; Next.js Consumption Contract now covers API04; Q05 (geographic scope) added to `BRD.md`'s Controlled Assumptions alongside Q07/Q08; `pending_resolution` modeled as a per-step status value, with the mechanism that sets it flagged as a new, honest Contract Gap rather than invented. **Reviewer:** start at the spec's "Reviewer guidance for the v1.2 re-review" (in its Gate 1 Review block) — lists what to check (condition 6, the self-caught `UT12`/`UT13` fix, the third-state question) and what can be skipped. **Next:** Sourav Kumar Maity re-reviews v1.2 |
+| `emp-internal-transfer` | Employee Internal Transfer Digital Journey | **Draft v1.2 — Gate 1 (Part 4): Changes Requested (minor)** | Developer | 2026-09-30 | v1.2 fixes all six conditions from Sourav's Part 3 re-review: `UT08`'s expected status corrected; `AC11` traceability now shows `AC18`/`API04`/`UT18`; stale "17 AC/17 UT/API01–API03" references corrected to 18/18/API01–API04 throughout; Next.js Consumption Contract now covers API04; Q05 (geographic scope) added to `BRD.md`'s Controlled Assumptions alongside Q07/Q08; `pending_resolution` modeled as a per-step status value, with the mechanism that sets it flagged as a new, honest Contract Gap rather than invented. **Reviewer:** start at the spec's "Reviewer guidance for the v1.2 re-review" (in its Gate 1 Review block) — lists what to check (condition 6, the self-caught `UT12`/`UT13` fix, the third-state question) and what can be skipped. **Next:** Sourav Kumar Maity re-reviews v1.2 **Part 4 re-review (2026-09-30): Changes Requested (minor)** — P4-01…P4-09 (stale `hr_approved` in API02/UT05/UT10; test_cases not updated; API04 must accept `pending_resolution` steps; `pendingWith` multi-step gap). **Next:** author resubmits v1.2.1 → Approved |
 
 ## Baseline artefacts
 
@@ -39,7 +39,7 @@ touched an artefact.
 | `BRD.md` | **Gate 1 PASS — 2026-09-30** (BRD-001) | Seeded from `source-docs/Requirement for SDD.docx`; open questions Q01–Q13 recorded, none silently resolved; controlled assumptions for Q07/Q08/Q05 (Q05 added in the v1.2 fix cycle). Final review recorded verbatim at the end of the file; carry-forward Q06, Q07/Q08, Q11, Q12, Q13 |
 | `.agent/rules/int-standards.laravel.md` | Created | Defaults only — no Laravel code exists in this repo yet to verify against |
 | `.agent/rules/int-standards.nextjs.md` | Created | Defaults only — no Next.js code exists in this repo yet to verify against |
-| `specs/emp-internal-transfer.spec.md` | **Draft v1.2 — In Peer Review (Gate 1 re-review)** | AC01–AC18, full API contract (API01–API04, `pending_resolution` step status), error contract, Next.js consumer contract (now covering API04), UT01–UT18, full traceability; all three Gate 1 review passes preserved verbatim plus "Revision Notes" (v1.1) and "Revision Notes v1.2" sections dispositioning every item |
+| `specs/emp-internal-transfer.spec.md` | **Draft v1.2 — Gate 1 (Part 4): Changes Requested (minor)** | AC01–AC18, full API contract (API01–API04, `pending_resolution` step status), error contract, Next.js consumer contract (now covering API04), UT01–UT18, full traceability; all three Gate 1 review passes preserved verbatim plus "Revision Notes" (v1.1) and "Revision Notes v1.2" sections dispositioning every item |
 | `test_cases/emp-internal-transfer.test_cases.md` | Authored | Broader QA scenarios: API, validation/boundary, auth/RBAC, state-transition, concurrency, contract, Next.js consumer, UI states, accessibility, cross-browser, regression |
 | `plans/`, `tasks/`, `decisions/`, `releases/` | Empty | Hold only `.gitkeep`; `plans/`/`tasks/` unblock only after Gate 1 Approved |
 | `.ai-context/templates/` | Present — 6 files | Restored 2026-09-30; the two that carried prior-project content (`spec.template.md`, `plan.template.md`) rewritten from the Blueprint's own §11.4/§29 canonical skeletons; two minor stale file-path references cleaned in `release.template.md`/`tasks.template.md`. The other four (`adr`, `hotfix-spec`, `release`, `tasks`) were already generic |
@@ -380,3 +380,27 @@ this board's Active specs row — so the reviewer knows exactly where to look on
 
 **Next:** Resubmit v1.2 to Sourav Kumar Maity for Gate 1 re-review. If he records Approved,
 `plans/`/`tasks/` unblock and Day 5 (Technical Plan) can begin.
+
+## Gate 1 re-review (Part 4) — spec v1.2 — 2026-09-30
+
+- Gate 1 Reviewer Sourav Kumar Maity reviewed the author's `specs/emp-internal-transfer.spec.md`
+  v1.2 (PR #2). Decision: **`Changes Requested (minor)`**. This is the binary Blueprint §12.3
+  state; "pass with conditions" is not formalised as a third state. Recorded as "Gate 1 Review
+  Comments (Part 4 — v1.2 re-review)" in the spec.
+- The substance of all six Part 3 conditions is accepted, including the condition 6 approach
+  (step-level `pending_resolution`). The UT12/UT13 self-caught fix is confirmed.
+- Nine mechanical items, P4-01…P4-09:
+  - Stale `hr_approved` references in the API02 status enumeration, UT05 and UT10.
+  - `test_cases` not updated for v1.2: counts, STATE-03, STATE-05, and no `pending_resolution`
+    scenarios.
+  - API04 accepts only `pending` steps, so a `pending_resolution` step has no exit and the request
+    could never reach `completed`.
+  - Record `pendingWith` being single-valued while several steps can be pending as a Contract Gap.
+- Blocking rationale: UT05 and UT08 disagree on the result of the same HR approve, and the
+  test-first rule would carry that into the first failing tests.
+- A reviewer's local draft of v1.2 was discarded in favour of the author's merged version, so that
+  approval rests on the author's edits. No `.plan.md`, `.tasks.md` or production code was created.
+
+**Next:** Author (Aditya Hazra) fixes P4-01…P4-09 as v1.2.1, with a Revision Notes row each, and
+resubmits. The reviewer verifies them against the checklist in the spec and records **Approved**,
+which unblocks Day 5 (Technical Plan).
