@@ -4,7 +4,7 @@
 `emp-internal-transfer`
 
 ## Status
-`Draft v1.1 — Gate 1 re-review returned PASS WITH MINOR CONDITIONS (2026-09-30); consistency fixes required — not yet Approved`
+`Draft v1.2 — In Peer Review (Gate 1 re-review)`
 
 ## Gate 1 Review
 **Author:** Aditya Hazra (SDD Developer) · **Gate 1 Reviewer:** Sourav Kumar Maity · **Review Date:** 2026-09-15
@@ -21,6 +21,37 @@ open decisions in this document.
 > consistency/traceability conditions (two 🔴, two 🟠, two 🟡); none requires a redesign. As with the
 > earlier `PASS WITH CONDITIONS`, this is treated as **not yet Approved** for gating purposes.
 > `plans/`/`tasks/` stay blocked until the conditions are corrected and the reviewer records Approved.
+>
+> **2026-09-30 — v1.2 addresses all six conditions.** See "Revision Notes v1.2" immediately after
+> Part 3 below for the point-by-point disposition. Status bumped to `Draft v1.2`. Still **not yet
+> Approved** — that requires the reviewer's own decision, not a self-declaration.
+
+### Reviewer guidance for the v1.2 re-review (author's request, 2026-09-30)
+
+A targeted pass, not a full re-read — nothing structural changed since v1.1.
+
+**Please specifically check:**
+
+| # | What | Where |
+|---|---|---|
+| 1 | **Condition 6 — the one real judgment call.** `pending_resolution` was modeled as a per-step `stages[].steps[].status` value (not a new top-level `status`), and the mechanism that *sets* it was recorded as a new Contract Gap rather than defined. Is that an acceptable resolution, or should the mechanism be specified too? | API02 — the `pending_resolution` paragraph after the `stages` JSON block; Contract Gaps table — last row |
+| 2 | **Self-caught `UT12`/`UT13` fix** — not one of your six conditions; same defect class as `UT08` (`AC12` widened in v1.1, `UT12` left stale). Please confirm it's correct and in scope. | Unit Test Cases table — `UT12`, `UT13`; Revision Notes v1.2 — "self-caught" row |
+| 3 | **Formalise "PASS WITH (MINOR) CONDITIONS"?** Raised as an open question since Part 1 and never settled. Should it become a third Gate 1 state, or should decisions stay binary (`Approved` / `Changes Requested`, per Blueprint §12.3)? | This Gate 1 Review block — "Recorded decision" paragraph |
+| 4 | **Spot-check the six fix locations** | Revision Notes v1.2 (fastest audit of all seven items); `UT08`; Traceability — journey stage 8 row; Next.js Consumption Contract; Open Decisions — Q05 row; Out of Scope — cross-border item; `BRD.md` — Controlled Assumptions (Q05) |
+
+**Safe to skip / no need to re-litigate:**
+
+- **Conditions 1–5 themselves** — mechanical consistency fixes (stale numbers, a missing
+  cross-reference, a label), each verified against the text before fixing. Just confirm they read
+  correctly.
+- **`BRD.md`'s Gate 1 PASS** — already closed. The only BRD change in v1.2 is adding Q05 to the
+  Controlled Assumptions section; Q01–Q04, Q09, Q10 were not touched.
+- **Items already listed in your "Positive Changes" / "Positive observations to retain"** across
+  all three passes — API04/AC18/UT18, AC14–AC17 authorization scenarios, the confirmation-events
+  split, error handling, the frontend/backend boundary. Unchanged.
+- **Underlying logic of `AC01`–`AC17`, `API01`–`API03`, and the other UTs** — only labels and
+  cross-references pointing *at* `AC18`/`API04`/`UT18` were corrected, not behaviour.
+- **Intent, Context, Non-Functional Constraints** — untouched since v1.1.
 
 **Recorded decision: `PASS WITH CONDITIONS`.** This is the reviewer's own wording, not one of the
 two decision states this section otherwise defines. It is recorded verbatim below rather than
@@ -337,6 +368,22 @@ yet dispositioned these items. The v1.1 "Revision Notes" table above covers Part
 | 5 | Open Decisions Q05 row says "cross-border excluded by default"; Out of Scope says "domestic transfers only" — neither is labelled a controlled assumption, and `BRD.md`'s Controlled Assumptions section covers Q07/Q08 only |
 | 6 | Status vocabulary has no failure/pending-resolution value; the BRD's Q08 assumption ("pending resolution") has no status or `stages[]` representation in the contract |
 
+## Revision Notes v1.2 — Response to Gate 1 Re-Review (Part 3, 2026-09-30)
+
+Point-by-point disposition of all six conditions. Conditions 1–5 are direct fixes (an internal
+inconsistency or a missing cross-reference, not a business question). Condition 6 needed one small,
+genuinely new modeling decision, made explicitly and narrowly rather than silently.
+
+| # | Disposition |
+|---|---|
+| 1 🔴 AC08/UT08 status inconsistency | **Fixed** — `UT08`'s Expected column now states both branches (`downstream_processing` or `completed`) instead of the stale `hr_approved`, matching `AC08` and the status vocabulary's "transient only" note |
+| 2 🔴 AC11 traceability | **Fixed** — the Traceability row for journey stage 8 now names `AC11`+`AC18`, `API04` (the actual completion transition) alongside `API03`/`API02`, and `UT11`+`UT18` |
+| 3 🟠 Stale 17/three-endpoint references | **Fixed** — all four locations (Unit Test Cases intro, status vocabulary intro, Day 3 self-review's three mentions) updated to 18 ACs/18 UTs/API01–API04/four endpoints |
+| 4 🟠 Next.js contract missing API04 | **Fixed** — the Next.js Consumption Contract section now names API04 alongside API01–API03 throughout, including its own loading/error semantics |
+| 5 🟡 Q05 not a labelled controlled assumption | **Fixed** — `BRD.md`'s Controlled Assumptions section now includes Q05 (domestic-only for v1.2); this spec's Open Decisions row and Out of Scope wording both now say "controlled assumption," not "excluded by default" |
+| *(self-caught, not one of the reviewer's six)* — `UT12` scenario still said "non-completed status" | **Fixed** — `AC12` was already widened to cover every state in v1.1, but `UT12` was left stale, same class of defect as condition 1. Caught while re-checking the file for this fix cycle and corrected; `UT13`'s wording also aligned to "non-terminal" for precision |
+| 6 🟡 No `pending_resolution` representation | **Modeled, with an honest new gap flagged** — `stages[].steps[].status` gains a `pending_resolution` value (a per-step detail, not a new top-level `status`, since a stuck step doesn't change the overall request's `downstream_processing` state). **New Contract Gap added:** no endpoint yet lets a downstream stakeholder actually report a step as unable to complete — only API04's "mark complete" exists. Adding *that* mechanism now would mean inventing a business process the BRD's Q08 assumption doesn't specify in enough detail (who decides "cannot be completed," on what basis, whether it's automatic or manual) — narrower to represent the *value* so the contract is honest about the state existing, and flag the *producing mechanism* as a Day 5 gap, than to invent an endpoint/workflow unprompted. |
+
 ## Linked BRD
 [`.ai-context/BRD.md#brd-001-employee-internal-transfer-digital-journey`](../BRD.md#brd-001-employee-internal-transfer-digital-journey)
 
@@ -396,9 +443,9 @@ belong to the Day 5 technical plan.
 
 ### Status and pending-with vocabulary (proposed, for Gate 1 confirmation)
 
-These values are used consistently across all three endpoints. They are a specification-level
-proposal derived from the ACs' transitions, not a confirmed BRD decision — the downstream-step
-names in particular depend on Q06/Q07 (open).
+These values are used consistently across all four endpoints (API01–API04). They are a
+specification-level proposal derived from the ACs' transitions, not a confirmed BRD decision — the
+downstream-step names in particular depend on Q06/Q07 (open).
 
 | `status` | Meaning | Terminal? |
 |---|---|---|
@@ -516,7 +563,7 @@ step, so the two possible next states are `downstream_processing` (steps apply) 
         { "stage": "manager_confirmation", "status": "pending | approved | declined" },
         { "stage": "hr_eligibility", "status": "pending | approved | declined | not_applicable" },
         { "stage": "downstream_processing", "status": "pending | in_progress | complete | not_applicable",
-          "steps": [ { "step": "org_info | payroll | it | facilities", "status": "pending | complete" } ] }
+          "steps": [ { "step": "org_info | payroll | it | facilities", "status": "pending | complete | pending_resolution" } ] }
       ]
     }
   }
@@ -529,6 +576,13 @@ step, so the two possible next states are `downstream_processing` (steps apply) 
   user is authorized to see**; this spec does not define a reduced view for any of the three
   permitted viewers (employee/manager/HR) beyond the isolation AC14/AC17 already require — the
   spec is silent on whether e.g. a manager should see the `reason` text, and this is a contract gap.
+
+  **`pending_resolution` (added v1.2):** represents `BRD.md`'s Q08 controlled assumption — a
+  downstream step that has been reported unable to complete surfaces this value rather than
+  silently failing, auto-retrying, or auto-escalating. It is a per-step detail, not a top-level
+  `status` value: the overall request stays `downstream_processing` (something is still in
+  progress, it just needs human follow-up on one step) — see the Contract Gaps table below for what
+  is deliberately *not* defined here (the mechanism that sets this value).
 
 - **Exceptions:**
 
@@ -630,6 +684,7 @@ step, so the two possible next states are `downstream_processing` (steps apply) 
 | Identity/role mapping for who holds the `org_info`/`payroll`/`it`/`facilities` responsibility API04 checks against | Q11 (extended, 2026-09-08) — the completion *mechanism* is now defined (API04); *who* is authorized is not |
 | Any endpoint for the manager/HR/Payroll/IT/Facilities side beyond API03's decision shape and API04's single completion action (e.g. a bulk queue view for HR, a Payroll dashboard) | Out of scope per the spec's "Explicitly Out of Scope" — no dedicated stakeholder interfaces are defined |
 | Withdrawal/cancellation endpoint | Q09 is open and withdrawal is explicitly Out of Scope |
+| Mechanism that sets a downstream step's status to `pending_resolution` (added v1.2) | Who decides a step "cannot be completed," on what basis, and whether it's a stakeholder action or an operational/manual process, is not specified by the BRD's Q08 assumption in enough detail to define an endpoint here — the *value* is modeled (see API02's response shape) so the contract is honest that this state exists; the mechanism producing it is a Day 5 gap |
 
 ### Error Contract
 
@@ -661,8 +716,11 @@ All error responses across every endpoint in this feature use one envelope:
 
 What the frontend can rely on, without reimplementing any authoritative rule itself:
 
-- **Success payload shapes** are exactly the `data` objects defined above for API01/API02/API03 —
-  the frontend renders them, it does not recompute `status`, `pendingWith`, or `stages`.
+- **Success payload shapes** are exactly the `data` objects defined above for API01/API02/API03/
+  API04 — the frontend renders them, it does not recompute `status`, `pendingWith`, or `stages`.
+  API04's response is the same shape as API02/API03, reflecting the completed step and any
+  resulting overall `status` change — the frontend does not need a distinct rendering path for it,
+  only the same status-view components already used for API02/API03.
 - **`status` and `pendingWith` are a closed, stable enumeration** (see the vocabulary table above).
   The frontend may switch UI on these string values but must treat an unrecognised value as an
   unexpected/error display state, not silently ignore it.
@@ -676,10 +734,13 @@ What the frontend can rely on, without reimplementing any authoritative rule its
   avoid offering an action (e.g. an approve/decline button) it already knows the current user
   cannot take, using `pendingWith` and the viewer's own known role/relationship — but this is a UX
   courtesy, not the enforcement point; the API still rejects it independently either way.
-- **Loading/pending/error semantics:** every one of the three endpoints needs an explicit loading
+- **Loading/pending/error semantics:** every one of the four endpoints needs an explicit loading
   state, a distinct error-state presentation per `errorCode` family (validation vs. auth vs.
   not-found vs. conflict vs. server error), and — for API02 — an empty/no-timeline-yet state
-  immediately after AC01's submission, before any stage has moved.
+  immediately after AC01's submission, before any stage has moved. A step showing
+  `pending_resolution` (see the status vocabulary) is a distinct display state too — not an error
+  the frontend caused, and not plain "pending" — so it should read as "needs attention," not be
+  silently rendered identically to a normal pending step.
 - **Timeline/pending-action fields** the frontend consumes are exactly `status`, `pendingWith`, and
   `stages[]` from API02/API03 — no separate audit/history endpoint is defined (see Contract Gaps).
 
@@ -947,7 +1008,7 @@ see `BRD.md`'s Open Decisions / Assumptions / Proposed Rules table for full deta
 | Q01 | Eligibility criteria (e.g., minimum tenure) | AC05 — gate exists, criteria undefined |
 | Q02 | Minimum lead time before the effective date | No AC written — see Validation section note |
 | Q03 | Duplicate/concurrent active-transfer handling | No AC written — see dedicated section above |
-| Q05 | Geographic scope (domestic vs. cross-border) | Out of Scope section — cross-border excluded by default |
+| Q05 | Geographic scope (domestic vs. cross-border) | Out of Scope section — **controlled assumption adopted in v1.2** (see `BRD.md`): domestic-only for this spec, not a confirmed decision |
 | Q06 | Ownership of the organisational-information update stage | AC10 — step tracked generically, owner still undefined (the Q07 assumption below does not resolve this) |
 | Q07 | Rule deciding which downstream steps apply to a given request | AC10, AC11, AC08 — **controlled assumption adopted in v1.1** (see `BRD.md`); still open for a confirmed answer, but no longer blocking spec-level work |
 | Q08 | Rejection/rollback semantics once later stages have begun | AC07, AC09 — **controlled assumption adopted in v1.1** (see `BRD.md`): rejection is terminal with nothing to roll back; downstream failure surfaces as "pending resolution," not auto-retry/auto-escalate |
@@ -959,7 +1020,9 @@ see `BRD.md`'s Open Decisions / Assumptions / Proposed Rules table for full deta
 ## Explicitly Out of Scope
 
 - **Cross-border tax/legal processing.** The BRD does not confirm cross-border/relocation transfers
-  are in scope for v1 (Q05); until confirmed, this spec covers domestic transfers only.
+  are in scope for v1 (Q05). **Controlled assumption (added v1.2, see `BRD.md`):** this spec covers
+  domestic transfers only, until Q05 resolves — labelled as an assumption, not presented as a
+  confirmed decision, consistent with how Q07/Q08 are treated.
 - **Compensation renegotiation.** Not mentioned anywhere in the source requirement; a transfer
   request carries a proposed department/location/role and effective date, not a compensation
   change.
@@ -1015,7 +1078,7 @@ Per `constitution.md` (all `[Provisional]` unless noted):
 
 ## Unit Test Cases (spec-derived)
 
-One-to-one with the final ACs (17 ACs → 17 UTs). Each is independently verifiable and derived
+One-to-one with the final ACs (18 ACs → 18 UTs). Each is independently verifiable and derived
 directly from its AC's Given/When/Then — none introduces a scenario the AC doesn't already state.
 
 | Test ID | Maps to AC | Scenario | Expected |
@@ -1027,12 +1090,12 @@ directly from its AC's Given/When/Then — none introduces a scenario the AC doe
 | `emp-internal-transfer.UT05` | AC05 | HR calls API03 on a `manager_approved` request with `decision: approve` or `decision: decline` | `200`; status becomes `hr_approved` or `hr_declined` respectively; no assertion made about *which* decision is "correct" — this UT only proves the gate produces a recorded decision |
 | `emp-internal-transfer.UT06` | AC06 | Manager calls API03 on a `submitted` request with `decision: approve` | `200`; `status: manager_approved`; `pendingWith: hr` |
 | `emp-internal-transfer.UT07` | AC07 | Manager calls API03 on a `submitted` request with `decision: decline` | `200`; `status: manager_declined`; `pendingWith: none`; a subsequent HR action attempt would hit `409 invalid_state_transition` (cross-check with UT16) |
-| `emp-internal-transfer.UT08` | AC08 | HR calls API03 on a `manager_approved` request with `decision: approve` | `200`; `status: hr_approved`; `pendingWith` reflects the next applicable stakeholder or `none` if nothing applies |
+| `emp-internal-transfer.UT08` | AC08 | HR calls API03 on a `manager_approved` request with `decision: approve` (parameterised over both branches of the Q07 assumption: a request with at least one applicable downstream step, and one with none) | `200`; `status` transitions to `downstream_processing` (steps apply) or directly to `completed` (none apply) — **never observed as `hr_approved`**, which is transient only (see the status vocabulary); `pendingWith` reflects the next applicable stakeholder or `none` |
 | `emp-internal-transfer.UT09` | AC09 | HR calls API03 on a `manager_approved` request with `decision: decline` | `200`; `status: hr_declined`; `pendingWith: none` |
 | `emp-internal-transfer.UT10` | AC10 | GET API02 on an `hr_approved` request with applicable downstream steps | `200`; `stages[].steps[]` lists each applicable step individually as `pending` until completed |
 | `emp-internal-transfer.UT11` | AC11 | Every applicable downstream step for a request is marked complete | `status` transitions to `completed`; employee-facing response confirms completion |
-| `emp-internal-transfer.UT12` | AC12 | Requesting employee calls API02 at any non-completed status | `200`; `status` field present and correct |
-| `emp-internal-transfer.UT13` | AC13 | Requesting employee calls API02 at any non-completed status | `200`; `pendingWith` field present and correct |
+| `emp-internal-transfer.UT12` | AC12 | Requesting employee calls API02 at any status, including a terminal one (`completed`, `manager_declined`, `hr_declined`) | `200`; `status` field present and correct in every case, including terminal states |
+| `emp-internal-transfer.UT13` | AC13 | Requesting employee calls API02 while the request is in a non-terminal status | `200`; `pendingWith` field present and correct |
 | `emp-internal-transfer.UT14` | AC14 | Employee B calls API02 for Employee A's request | `403 forbidden` (this spec's decision — see API02 exceptions); no request data in the response |
 | `emp-internal-transfer.UT15` | AC15 | A manager who is not the request's employee's manager calls API03 while `pendingWith: manager` | `403 forbidden_wrong_stakeholder`; no state change |
 | `emp-internal-transfer.UT16` | AC16 | A caller without the HR role calls API03 while `pendingWith: hr` | `403 forbidden_wrong_stakeholder`; no state change |
@@ -1058,7 +1121,7 @@ since it spans two UTs and doesn't map to a single AC).
 | Journey stage 2 (manager confirmation/approval) | AC06, AC07 | API03 | UT06, UT07 |
 | Journey stage 3 (HR eligibility validation) | AC08, AC09 | API03 | UT08, UT09 |
 | Journey stages 4–7 (org-info/payroll/IT/facilities, "where applicable") | AC10 | API02 | UT10 |
-| Journey stage 8 (employee confirmation/completion) | AC11 | API03 (final transition) / API02 (visibility) | UT11 |
+| Journey stage 8 (employee confirmation/completion) | AC11 (reached via AC18 when downstream steps apply, or directly from AC08 when none do) | API04 (downstream-step completion transition) / API03 (direct HR-approval-to-completed transition, zero-downstream-steps branch) / API02 (visibility) | UT11, UT18 |
 | §3 "view current status" | AC12 | API02 | UT12 |
 | §3 "view pending actions" | AC13 | API02 | UT13 |
 | Actors table (§2); Authorization/RBAC questions | AC14–AC17 | API02, API03 | UT14–UT17 |
@@ -1066,6 +1129,7 @@ since it spans two UTs and doesn't map to a single AC).
 | Gate 1 review Part 2 #1 — downstream completion mechanism (added v1.1) | AC18 | API04 | UT18 |
 | Q12 (Manager→HR sequencing, added v1.1) — **open, spec's working assumption only** | AC06–AC09 | API03 | UT06–UT09 |
 | Q13 (department/location/role selection rule, added v1.1) — **open** | AC04 | API01 | UT04 |
+| Q05 (geographic scope, controlled assumption added v1.2) — **open** | Out of Scope section | — no endpoint (domestic-only affects Contract Gaps, not a specific endpoint) | — no UT |
 
 ## Self-Review Against the Day 2 Completion Gate (superseded by Day 3 below, kept for history)
 
@@ -1082,16 +1146,21 @@ since it spans two UTs and doesn't map to a single AC).
 
 ## Self-Review Against the Day 3 / Gate 1 Readiness Check
 
+> **Numbers corrected in v1.2** (Gate 1 re-review condition 3) to stay consistent with the current
+> spec — this section originally described the Day 3 state (17 ACs, API01–API03), which is no
+> longer the current count now that `AC18`/`API04`/`UT18` exist. Updated in place rather than left
+> stale, per the reviewer's explicit request.
+
 - Intent remains unambiguous and unchanged from Day 2.
-- All 17 ACs are individually IDed and testable; none were added or altered on Day 3.
-- API contract (API01–API03) has full payloads, success shapes, status codes, and a
-  per-endpoint exception table with stable `errorCode` values.
+- All 18 ACs are individually IDed and testable (17 as of Day 3; `AC18` added in v1.1).
+- API contract (API01–API04; API01–API03 as of Day 3, `API04` added in v1.1) has full payloads,
+  success shapes, status codes, and a per-endpoint exception table with stable `errorCode` values.
 - The contract is framework-neutral — no controller, Eloquent model, migration, or middleware
   class name appears anywhere in it; the base path, error envelope, and 403/404 split are
   explicitly flagged as proposed specification decisions for Gate 1, not repository facts.
 - The Next.js Consumption Contract section states what the frontend may rely on and reiterates
   that no authoritative business rule is reimplemented client-side.
-- All 17 UTs map 1:1 to the 17 ACs (`UT01`↔`AC01` … `UT17`↔`AC17`); none were forced to a fixed
+- All 18 UTs map 1:1 to the 18 ACs (`UT01`↔`AC01` … `UT18`↔`AC18`); none were forced to a fixed
   count.
 - Broader QA/developer scenarios exist in `.ai-context/test_cases/emp-internal-transfer.test_cases.md`,
   and do not duplicate this file's compact UT table.
@@ -1126,3 +1195,24 @@ since it spans two UTs and doesn't map to a single AC).
   resubmitted spec, rather than inventing a new status label.
 - Still no `.plan.md`, `.tasks.md`, migration, controller, service, React component, or production
   code — this revision stays within spec-authoring scope.
+
+## Self-Review Against Gate 1 Re-Review Readiness (v1.2, 2026-09-30)
+
+- All six conditions from Part 3 (the v1.1 re-review) have a disposition in "Revision Notes v1.2"
+  above, each pinned to the exact location the reviewer's own "Where each condition applies" table
+  named.
+- Conditions 1–5 are direct, mechanical fixes — an internal inconsistency (1, 2), stale counts (3),
+  a missing cross-reference (4), or an inconsistent assumption label (5) — none required rethinking
+  a decision already made.
+- Condition 6 required one genuinely new choice (where `pending_resolution` lives in the data
+  model). Made narrowly: a per-step value, not a new top-level `status`, and the *producing
+  mechanism* was flagged as a new Contract Gap rather than invented — consistent with this spec's
+  standing discipline of not inventing a business process/endpoint the BRD doesn't specify enough
+  to define.
+- No AC, API, or UT was removed or renumbered in this revision either — `AC18`/`API04`/`UT18` stay
+  where v1.1 put them; only the stale references *to* them were corrected, plus one new step-status
+  value and one new Contract Gap row.
+- `BRD.md`'s Controlled Assumptions section gained Q05 alongside Q07/Q08, keeping the assumption
+  pattern consistent across all three items the spec depends on without a confirmed answer.
+- Still no `.plan.md`, `.tasks.md`, migration, controller, service, React component, or production
+  code.

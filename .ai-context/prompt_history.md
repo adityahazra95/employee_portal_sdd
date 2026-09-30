@@ -273,3 +273,47 @@ conditions were checked against the spec text and confirmed; a table in the spec
 applies. None was fixed here. No tests were run (documentation-only change).
 **Follow-up:** Developer fixes conditions 1–6 as v1.2 and resubmits for the reviewer to record
 Approved. Condition 5 may need a Q05 controlled-assumption entry added to `BRD.md`.
+
+### 2026-09-30 — emp-internal-transfer.gate1-fix-v1.2
+**Prompted by:** Aditya Hazra (Developer)
+**Instruction (summary):** Fix all six conditions from Sourav Kumar Maity's Part 3 re-review, aimed
+at getting Gate 1 Approved on this version.
+**Verification performed before fixing:** independently checked all six conditions against the
+actual current spec text (not just trusted the review) — all six confirmed accurate.
+**Artefacts touched:** `.ai-context/specs/emp-internal-transfer.spec.md` (bumped to `Draft v1.2`),
+`.ai-context/BRD.md`, `.ai-context/status.md`.
+**Outcome:**
+1. Fixed `UT08`'s Expected column (no longer claims `status: hr_approved`; states both branches).
+2. Fixed the Traceability table's AC11 row to name `AC18`/`API04`/`UT18`.
+3. Fixed stale `17`/`API01–API03`/"three endpoints" references in three locations (Unit Test Cases
+   intro, status vocabulary intro, Day 3 self-review — with a note that the Day 3 numbers were
+   corrected in place per the reviewer's explicit request, not silently rewritten).
+4. Added API04 to the Next.js Consumption Contract, including a `pending_resolution` display note.
+5. Added Q05 to `BRD.md`'s Controlled Assumptions (alongside Q07/Q08); reworded the spec's Open
+   Decisions Q05 row and Out of Scope wording to say "controlled assumption."
+6. Added `pending_resolution` as a `stages[].steps[].status` value (per-step, not a new top-level
+   `status`). Did **not** invent an endpoint/mechanism for a downstream stakeholder to report a
+   step un-completable — the BRD's Q08 assumption doesn't specify who decides this or how, so this
+   was recorded as a new, explicit Contract Gap instead of an invented mechanism.
+Also self-caught while re-checking (not one of the six): `UT12` still said "non-completed status,"
+stale from the same `AC12` widening v1.1 already made — same defect class as condition 1. Fixed;
+`UT13` aligned to "non-terminal" wording for precision.
+Added "Revision Notes v1.2" (dispositioning all six, plus the self-caught item) and a "Self-Review
+Against Gate 1 Re-Review Readiness (v1.2)" section. No AC/API/UT renumbered — only in-place
+corrections plus one new step-status value and one new Contract Gap row. No tests run; no
+`.plan.md`, `.tasks.md`, or
+production code created.
+**Follow-up:** Resubmit v1.2 to Sourav Kumar Maity for Gate 1 re-review.
+
+### 2026-09-30 — emp-internal-transfer.gate1-v1.2-reviewer-guidance
+**Prompted by:** Aditya Hazra (Developer)
+**Instruction (summary):** Record the check-vs-skip guidance for the Gate 1 reviewer in the files
+themselves, so it's visible on pull.
+**Artefacts touched:** `specs/emp-internal-transfer.spec.md` (new "Reviewer guidance for the v1.2
+re-review" subsection in the Gate 1 Review block), `BRD.md` (pointer note under the Gate 1 PASS
+line — only Q05 changed), `status.md` (pointer in the Active specs row + execution log note).
+**Outcome:** Guidance lists four items to check (condition 6's design call, the self-caught
+`UT12`/`UT13` fix, whether to formalise a third Gate 1 state, spot-check locations) and five to
+skip. Uses section names, not line numbers, since those shift. No spec content, AC, API, or UT
+changed. Documentation-only.
+**Follow-up:** Commit/push when ready, then resubmit to Sourav Kumar Maity.
