@@ -332,3 +332,21 @@ reviewer-authored v1.2 commit was not pushed. It is kept only on the local branc
 tests were run (documentation-only change).
 **Follow-up:** Author resubmits v1.2.1 fixing P4-01…P4-09; the reviewer then verifies and records
 Approved.
+
+### 2026-09-30 — emp-internal-transfer.gate1-fix-v1.2.1
+**Prompted by:** Aditya Hazra (Developer)
+**Instruction (summary):** Fix all nine Part 4 items (P4-01…P4-09) and report what was fixed.
+**Verification performed:** checked each item against the files before fixing (all accurate),
+and after fixing, searched both files to confirm every line of the reviewer's approval checklist
+rather than assuming it.
+**Artefacts touched:** `specs/emp-internal-transfer.spec.md` (→ `Draft v1.2.1`),
+`test_cases/emp-internal-transfer.test_cases.md`, `status.md`, `prompt_history.md`.
+**Outcome:** P4-01/02/03/05/06: `hr_approved` removed as a returned value or expected result
+(API02, UT05, UT10, STATE-03, STATE-05); API03 gained a per-action result table. P4-04/08:
+test-cases file updated to 18 UTs / API01–API04 / Q01–Q13, with new rows AUTH-09/10,
+STATE-09…13 and FE-09. P4-07: API04 accepts `pending_resolution` steps; AC18/UT18 aligned; a
+duplicate 404/409 condition removed. P4-09: `pendingWith` multi-step point recorded as a Contract
+Gap. Same-class extras fixed and disclosed: FE-03 status count, four-endpoint references, a
+garbled CONC-02 sentence. "Revision Notes v1.2.1" added with a row per item and a checklist
+self-check. No AC/API/UT renumbered. No tests run; no plan, tasks or production code.
+**Follow-up:** Resubmit v1.2.1 to Sourav Kumar Maity for the Gate 1 decision.
