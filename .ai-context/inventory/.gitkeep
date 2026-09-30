@@ -1,0 +1,4 @@
+This folder is not part of the INT SDD Blueprint's canonical .ai-context/ structure (see §15) —
+it was specific to a prior, unrelated project's large-legacy-codebase discovery process and isn't
+a standard SDD artifact. Left empty/kept out of the artifact chain unless this project later has
+an actual reason to inventory existing code (once Laravel/Next.js source exists).

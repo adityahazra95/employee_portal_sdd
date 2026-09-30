@@ -11,10 +11,9 @@ per `source-docs/INT SDD BluePrint - V1.0.pdf` (see [SRS.md](SRS.md) / registry 
 below may be stricter than the standard; none may weaken it.
 
 > **Reset note (2026-09-03):** this repository previously held constitution content for an
-> unrelated project ("Empty Floor + Circle Tap", a real-estate marketplace on Express/TypeScript).
-> That content is archived at
-> [`_archive/empty-floor-legacy/constitution.md`](_archive/empty-floor-legacy/constitution.md) and
-> does not apply here. This document is a fresh v1.0 for the One-Point Employee Portal.
+> unrelated prior project on a different technology stack. That content does not apply here and is
+> no longer retained in this repository. This document is a fresh v1.0 for the One-Point Employee
+> Portal.
 
 > **Provisional values.** Lines marked `[Provisional]` are carried over as sensible SDD defaults or
 > derived from the assessment brief, not from a signed-off organisational decision. They are

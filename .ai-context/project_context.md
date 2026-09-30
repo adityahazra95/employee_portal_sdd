@@ -2,10 +2,9 @@
 
 One-page orientation. What you would hand a new engineer on day one, before anything else.
 
-> **Reset note (2026-09-03):** this file previously described an unrelated project ("Empty Floor +
-> Circle Tap", a real-estate marketplace on Express/TypeScript/Prisma). That content is archived at
-> [`_archive/empty-floor-legacy/project_context.md`](_archive/empty-floor-legacy/project_context.md)
-> and does not apply here.
+> **Reset note (2026-09-03):** this file previously described an unrelated prior project on a
+> different technology stack. That content does not apply here and is no longer retained in this
+> repository.
 
 ## Objective
 
@@ -84,16 +83,18 @@ No `.spec.md`, `.plan.md`, `.tasks.md`, or implementation code exists yet — no
 until an Approved spec and an approved, test-first task breakdown exist. See
 [status.md](status.md).
 
-## Prior project cleanup (2026-09-04)
+## Prior project cleanup (2026-09-04 through 2026-09-30)
 
-After the Day 2 spec was reviewed, the developer confirmed the remaining leftover "Empty Floor +
-Circle Tap" artefacts were not needed and asked for them to be removed (their content had already
-been preserved outside the repo). Removed: `_archive/empty-floor-legacy/`, `SRS.md`,
-`architecture.md`, `inventory/`, `templates/`, `source-docs/README.md`,
-`source-docs/proposal-extract.md`, and `.agent/rules/int-standards.node.md`. `prompt_history.md`
-was kept intact (its own rule is append-only/never-deleted; the prior entries are clearly marked
-as belonging to the repurposed-away project). `releases/` and `decisions/` were kept — they were
-always empty, generic scaffolding, not Empty-Floor-specific content.
+Across several passes, all prior-project content was identified and permanently removed from this
+repository: `SRS.md`, `architecture.md`, `source-docs/README.md`, `source-docs/proposal-extract.md`,
+`.agent/rules/int-standards.node.md`, and (confirmed via the INT SDD Blueprint's own canonical
+`.ai-context/`/`.agent/` structure to not even be a standard SDD artifact) the `inventory/` folder.
+`prompt_history.md`'s pre-2026-09-03 entries were also removed on explicit, repeated request — that
+history remains available outside the repo, in persistent memory, not in this repository. `.agent/
+workflows/` and `.ai-context/templates/` are retained and kept current — both are genuinely
+reusable, project-agnostic scaffolding (the Blueprint's own canonical templates and workflow
+purpose descriptions), not prior-project content, once cleaned of that project's specific defaults.
+`releases/` and `decisions/` are kept as always-empty generic scaffolding.
 
 There is currently no `architecture.md` for the One-Point Employee Portal — one is expected to be
 authored once the Day 5 technical plan or actual Laravel/Next.js scaffolding exists.

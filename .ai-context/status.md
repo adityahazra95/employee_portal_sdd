@@ -1,17 +1,16 @@
 # Project Status Board
 
-_Last updated: 2026-09-15 (Day 4) — updated by: Sourav Kumar Maity (Gate 1 Reviewer)_
+_Last updated: 2026-09-30 — updated by: Aditya Hazra (Developer)_
 
 Single source of truth for **what is happening right now**. Updated the same day by whoever last
 touched an artefact.
 
-> **Reset note (2026-09-03):** this board previously tracked an unrelated project ("Empty Floor +
-> Circle Tap", 38-spec retro-spec programme). That content — plus the rest of the leftover
-> Empty Floor artefacts (`SRS.md`, `architecture.md`, `inventory/`, `templates/`,
-> `source-docs/README.md`, `source-docs/proposal-extract.md`, `.agent/rules/int-standards.node.md`)
-> — was confirmed not needed and permanently removed from the repo on 2026-09-04 after Day 2
-> review; the context is preserved outside the repo instead. This board tracks `emp-internal-transfer`
-> only.
+> **Reset note (2026-09-03):** this board previously tracked an unrelated prior project (a
+> multi-spec programme on a different technology stack). That content — plus the rest of the
+> leftover prior-project artefacts (`SRS.md`, `architecture.md`, `source-docs/README.md`,
+> `source-docs/proposal-extract.md`, `.agent/rules/int-standards.node.md`) — was confirmed not
+> needed and permanently removed from the repo; the context is preserved outside the repo instead.
+> This board tracks `emp-internal-transfer` only.
 
 ---
 
@@ -20,16 +19,16 @@ touched an artefact.
 | Item | State |
 |---|---|
 | Feature | `emp-internal-transfer` — Employee Internal Transfer Digital Journey |
-| Stage | **Gate 1 — Pass with Conditions (revision required)** |
+| Stage | **Draft v1.1 — In Peer Review (Gate 1 re-review)** |
 | Owner | Developer (Aditya Hazra) |
 | Gate 1 Reviewer | **Sourav Kumar Maity** |
-| SDD chain position | Day 4 of the assessment's recommended 10-day timeline complete (Gate 1 review recorded) |
+| SDD chain position | Day 4 (Gate 1 review + revision) complete; awaiting re-review before Day 5 (Technical Plan) |
 
 ## Active specs
 
 | Spec ID | Title | Status | Owner | Last Updated | Notes |
 |---|---|---|---|---|---|
-| `emp-internal-transfer` | Employee Internal Transfer Digital Journey | **Gate 1 — Pass with Conditions** | Developer | 2026-09-15 | Gate 1 review recorded by Sourav Kumar Maity (2026-09-15) in the spec's Gate 1 Review block: decision `PASS WITH CONDITIONS`, treated as **not yet Approved** for gating purposes. Conditions focus on conditional downstream workflow (Q07), rejection/failure handling (Q08), Manager→HR sequencing, and authorization/stakeholder ownership (Q06/Q11). **Next:** developer revises BRD/spec addressing the recorded conditions, then a re-review |
+| `emp-internal-transfer` | Employee Internal Transfer Digital Journey | **Draft v1.1 — In Peer Review (Gate 1 re-review)** | Developer | 2026-09-30 | Revised in response to both Gate 1 review passes: `BRD.md` gained Q12/Q13 and controlled assumptions for Q07/Q08; spec gained `AC18`/`API04` (downstream-completion mechanism), a fixed `hr_approved`→`completed` branch, a corrected `AC12` (no more non-completed restriction), and a "Revision Notes" section dispositioning every review item. **Next:** resubmit to Sourav Kumar Maity for Gate 1 re-review |
 
 ## Baseline artefacts
 
@@ -40,11 +39,14 @@ touched an artefact.
 | `BRD.md` | Authored — BRD-001 | Seeded from `source-docs/Requirement for SDD.docx`; 11 open questions (Q01–Q11) recorded, none silently resolved |
 | `.agent/rules/int-standards.laravel.md` | Created | Defaults only — no Laravel code exists in this repo yet to verify against |
 | `.agent/rules/int-standards.nextjs.md` | Created | Defaults only — no Next.js code exists in this repo yet to verify against |
-| `specs/emp-internal-transfer.spec.md` | **Gate 1 — Pass with Conditions (2026-09-15)** | AC01–AC17, Out of Scope, NFRs, frontend/backend boundary, full API contract (API01–API03), error contract, Next.js consumer contract, UT01–UT17, full traceability; Gate 1 review comments from Sourav Kumar Maity recorded in the spec's Gate 1 Review section, revision required before re-review |
+| `specs/emp-internal-transfer.spec.md` | **Draft v1.1 — In Peer Review (Gate 1 re-review)** | AC01–AC18, full API contract (API01–API04), error contract, Next.js consumer contract, UT01–UT18, full traceability; both Gate 1 review passes preserved verbatim plus a "Revision Notes" section dispositioning every item |
 | `test_cases/emp-internal-transfer.test_cases.md` | Authored | Broader QA scenarios: API, validation/boundary, auth/RBAC, state-transition, concurrency, contract, Next.js consumer, UI states, accessibility, cross-browser, regression |
 | `plans/`, `tasks/`, `decisions/`, `releases/` | Empty | Hold only `.gitkeep`; `plans/`/`tasks/` unblock only after Gate 1 Approved |
-| `SRS.md`, `architecture.md`, `inventory/`, `templates/`, `source-docs/README.md`, `source-docs/proposal-extract.md`, `.agent/rules/int-standards.node.md` | **Removed 2026-09-04** | Empty Floor content, confirmed unneeded after Day 2 review; context preserved outside the repo, not in these files |
-| `prompt_history.md` | Kept | Append-only audit trail; pre-2026-09-03 entries describe the prior project and are clearly marked as such, not deleted |
+| `.ai-context/templates/` | Present — 6 files | Restored 2026-09-30; the two that carried prior-project content (`spec.template.md`, `plan.template.md`) rewritten from the Blueprint's own §11.4/§29 canonical skeletons; two minor stale file-path references cleaned in `release.template.md`/`tasks.template.md`. The other four (`adr`, `hotfix-spec`, `release`, `tasks`) were already generic |
+| `.ai-context/inventory/` | Empty (`.gitkeep` only) | Not part of the Blueprint's canonical `.ai-context/` structure (§15) — was prior-project discovery output (an existing codebase's module/API/DB inventory on a different stack); removed again 2026-09-30 after being reintroduced, since there's no code in this repo yet to inventory |
+| `.agent/workflows/` | Authored 2026-09-30 | `generate-plan.md`, `generate-tests.md`, `code-review.md` — mandated by Blueprint §15 but missing since the 2026-09-04 cleanup accidentally took the folder itself along with its prior-project-specific content; rebuilt fresh, Laravel/Next.js-neutral |
+| `SRS.md`, `architecture.md`, `source-docs/README.md`, `source-docs/proposal-extract.md`, `.agent/rules/int-standards.node.md` | **Removed 2026-09-04** | Prior-project content, confirmed unneeded after Day 2 review; context preserved outside the repo, not in these files |
+| `prompt_history.md` | Kept, trimmed 2026-09-30 | Append-only audit trail for this project; its pre-2026-09-03 entries (the prior project's own history) were permanently removed on explicit request — that history is preserved outside the repo, in persistent memory, not here |
 
 ## Day 1 execution log — 2026-09-03
 
@@ -100,7 +102,7 @@ refinement + API Contract + spec-derived Test Cases) once the developer is ready
 ## Repository cleanup — 2026-09-04 (after Day 2 review)
 
 The developer reviewed `emp-internal-transfer.spec.md`, confirmed intent to proceed to Day 3, and
-asked that the leftover Empty Floor content be removed from the repo now that it's confirmed
+asked that the leftover prior-project content be removed from the repo now that it's confirmed
 unneeded, on condition that its context is preserved (outside the repo, in memory) rather than
 lost outright. Before removing anything, the repurposing history and rationale were saved to
 persistent memory. Permanently removed: `_archive/empty-floor-legacy/`, `SRS.md`,
@@ -118,8 +120,8 @@ rule, and its pre-reset entries are already clearly demarcated as belonging to t
   `constitution.md`, both `.agent/rules/int-standards.*.md` files. `architecture.md` no longer
   exists (removed after Day 2, see the cleanup log above) — consistent with there being no
   existing API convention to inherit.
-- **Found and fixed two more leftover Empty Floor artefacts** missed in the prior cleanup pass:
-  the root `CLAUDE.md` (still titled "Empty Floor + Circle Tap API," pointing at the deleted
+- **Found and fixed two more leftover prior-project artefacts** missed in the prior cleanup pass:
+  the root `CLAUDE.md` (still titled for the prior project, pointing at the deleted
   `int-standards.node.md`, still stating the old "blocked pending Phase 1" rule — rewritten for
   this project) and the entire `.agent/workflows/` directory (a Gate 2 reviewer/code-review/
   generate-plan/generate-tests toolchain built specifically for that project, naming its
@@ -227,3 +229,66 @@ resubmits for another Gate 1 pass.
 
 **Next:** unchanged — developer revises `BRD.md`/`specs/emp-internal-transfer.spec.md` addressing
 both review passes (BRD-level and spec-level) together, then resubmits for Gate 1 re-review.
+
+## Gate 1 revision (v1.1) + workspace fixes — 2026-09-30
+
+Read the full INT SDD Blueprint PDF for the first time this session (previously only the
+summarized methodology had been used) — grounded this revision and the workspace fixes below
+directly in the actual standard.
+
+**BRD.md revised:**
+- Added **Q12** (Manager→HR sequencing — enforced rule or incidental ordering) and **Q13**
+  (department/location/role selection business rule), both raised by the Gate 1 review and
+  previously only recorded in review prose, not tracked.
+- Added a **"Controlled Assumptions Adopted for Spec v1.1"** section: explicit, labelled working
+  assumptions for **Q07** (downstream applicability, grounded in which fields the request actually
+  changes) and **Q08** (rejection is terminal with nothing to roll back; downstream failure
+  surfaces as "pending resolution," not auto-retry/escalate) — adopted because the reviewer's own
+  Part 2 observation 3 explicitly invited a controlled assumption in lieu of a confirmed answer,
+  and no stakeholder is available in this assessment context to provide one.
+- Extended **Q11**'s scope to cover the new downstream-step actors (Payroll/IT/Facilities/org-info),
+  not just Manager/HR.
+
+**`specs/emp-internal-transfer.spec.md` revised to Draft v1.1:**
+- Added a **"Revision Notes"** section dispositioning every item from both Gate 1 review passes
+  (fixed directly / controlled assumption adopted / recorded as new BRD item) — see the spec itself
+  for the full table.
+- **Fixed directly** (not business questions, spec's own defects): `AC12` no longer excludes
+  completed/rejected requests from status visibility (the source never stated that exclusion); the
+  `hr_approved` status vocabulary now explicitly branches to `completed` (zero downstream steps) or
+  `downstream_processing` (one or more apply), closing the inconsistency with `AC11`.
+- **Added:** `AC18` and `API04` (`POST .../downstream-steps/{step}/complete`) — the previously
+  nonexistent mechanism for a downstream stakeholder to mark their step complete, without which
+  `AC11` had no implementable path. Authorization identity for who holds each downstream role
+  remains open (Q11, extended) — the mechanism itself does not.
+- Added a **"Confirmation events"** note naming three distinct moments (submission acknowledgement,
+  decision-outcome notification, completion confirmation) that were previously conflated.
+- Status bumped to `Draft v1.1 — In Peer Review (Gate 1 re-review)`, replacing the non-standard
+  "Pass with Conditions" label with the Blueprint's actual §12.3 convention (version-bump on
+  revision, binary Approved/Changes-Requested outcome).
+- Nothing renumbered or removed — `AC01`–`AC17`/`API01`–`API03`/`UT01`–`UT17` unchanged in place;
+  only additions (`AC18`/`API04`/`UT18`) and in-place clarifications.
+
+**Workspace fixes (per this session's Blueprint read and the developer's explicit request to
+remove any remaining prior-project context):**
+- `.agent/workflows/` — authored fresh (`generate-plan.md`, `generate-tests.md`, `code-review.md`).
+  Blueprint §15 lists this folder as mandatory; it went missing during the 2026-09-04 cleanup
+  because the only versions of those three files that existed at the time were prior-project-
+  specific and were removed along with the folder itself.
+- `.ai-context/templates/` — the developer restored all six files from their own source; two
+  (`spec.template.md`, `plan.template.md`) still carried prior-project specifics (Prisma/Redis/
+  Vitest, `src/domain/` layering, the prior project's default author/reviewer names, Wave/Tier
+  language) and were rewritten — `spec.template.md` transcribed directly from the Blueprint's own §11.4/§29
+  skeleton plus this project's proven additions (Gate 1 Review block, Open Decisions table,
+  Frontend/Backend boundary, Traceability); `plan.template.md` restructured for Laravel/Next.js.
+  Two minor stale file-path references (`src/openapi/openapi-document.ts`) cleaned in
+  `release.template.md`/`tasks.template.md`; the other three files needed no changes.
+- `.ai-context/inventory/` — the developer also restored this folder's original four files
+  (module/API/database/dependency inventory of the old Express/Prisma codebase). Confirmed against
+  the Blueprint's own §15 file listing that `inventory/` is **not** part of the canonical SDD
+  structure at all — it was bespoke to the prior project's legacy-codebase backfill. Removed again;
+  left as an empty, explained placeholder rather than repopulating it with anything, since there's
+  no code in this repo yet to inventory.
+
+**Next:** developer (Aditya Hazra) resubmits `specs/emp-internal-transfer.spec.md` v1.1 and the
+revised `BRD.md` to Sourav Kumar Maity for Gate 1 re-review.

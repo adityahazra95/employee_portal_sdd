@@ -4,10 +4,9 @@ Where a requirement is **first written down**, before it becomes a spec. A spec 
 first place a requirement appears. Entries are numbered, never renumbered, and never deleted —
 superseded entries are marked, not removed.
 
-> **Reset note (2026-09-03):** this file previously held BRD-001…012 for an unrelated project
-> ("Empty Floor + Circle Tap"). That content is archived at
-> [`_archive/empty-floor-legacy/BRD.md`](_archive/empty-floor-legacy/BRD.md) and does not apply
-> here. Numbering restarts at BRD-001 for this project.
+> **Reset note (2026-09-03):** this file previously held BRD-001…012 for an unrelated prior
+> project. That content does not apply here and is no longer retained in this repository.
+> Numbering restarts at BRD-001 for this project.
 
 **Source document:** `source-docs/Requirement for SDD.docx` — "SDD Developer Assessment: Employee
 Internal Transfer Digital Journey." This is the **only** authoritative source consulted for this
@@ -102,7 +101,10 @@ in the source). Everything else about *how* each stage behaves is Open — see b
   and optional reason.
 - The employee can see current status and which stakeholder an action is pending with, at any time.
 - Manager confirmation and HR eligibility validation are both required steps, in that order relative
-  to each other (manager before HR, per the source's step order) before downstream execution.
+  to each other (manager before HR, per the source's step order) before downstream execution. Gate
+  1 review flagged that "sequential in the source's list" and "sequential as an enforced rule with
+  parallel explicitly ruled out" are not necessarily the same confirmed decision — the spec treats
+  strict sequencing as its working assumption (see Q12), not yet a fully confirmed business rule.
 - Payroll, IT, and Facilities involvement is conditional ("where applicable") rather than universal
   for every transfer.
 
@@ -136,7 +138,37 @@ that depends on it can be Approved.
 | Q08 | Whether HR can reject a request outright, or only Manager can, and what happens to Payroll/IT/Facilities steps already triggered if a later stage rejects | **Not in source** | PM/HR (TBD) | Blocks rollback/failure-handling acceptance criteria |
 | Q09 | Whether the employee can withdraw/cancel a submitted request before it completes | **Not in source** | PM (TBD) | Blocks a capability not listed in source §3 but common to this kind of workflow — must not be assumed in scope |
 | Q10 | Data ownership for each downstream update (which system is authoritative for org-info, payroll, IT access, facilities/seating) | **Not in source** | IT/HR/Payroll/Facilities system owners (TBD) | Blocks the integration-contract question in Dependencies below |
-| Q11 | RBAC — who can act as "the manager" or "HR" for a given request (reporting-line lookup source, delegation/out-of-office coverage) | **Not in source** | IT/HR (TBD) | Blocks authorization design for the approval steps |
+| Q11 | RBAC — who can act as "the manager" or "HR" for a given request (reporting-line lookup source, delegation/out-of-office coverage); extended by Gate 1 review (2026-09-08) to also cover who can act as "Payroll"/"IT"/"Facilities" for a given downstream step | **Not in source** | IT/HR (TBD) | Blocks authorization design for the approval steps and, since the Gate 1 revision, for downstream-step completion (spec AC18/API04) |
+| Q12 | Whether Manager confirmation and HR eligibility validation must happen strictly in sequence (HR only begins once Manager has approved), or may happen in parallel | **Raised by Gate 1 review (Sourav Kumar Maity, 2026-09-08)** — the source presents the two steps in sequence but does not state whether that ordering is an enforced rule or incidental listing order | PM/HR (TBD) | The spec's AC06–AC09 currently model this as strictly sequential as a working assumption (see Business decisions below) — confirm or revise before Gate 2 |
+| Q13 | What determines the valid/selectable set of departments, locations, and roles a given employee may choose from when submitting a request (e.g. full org-wide list, filtered by an eligibility rule, sourced from an HRIS/org chart) | **Raised by Gate 1 review (Sourav Kumar Maity, 2026-09-08)** — not in source | HR/IT system owner (TBD) | Blocks the spec's AC04 "valid selectable option" concept and the reference-data API contract gap |
+
+## Controlled Assumptions Adopted for Spec v1.1 (Gate 1 revision, 2026-09-08)
+
+Sourav Kumar Maity's Gate 1 review (Part 2, observation 3) explicitly invited either a confirmed
+business rule for Q07, or "the controlled assumption to be used for the next SDD stage." No
+stakeholder is available to confirm Q07 or Q08 in this assessment context, so the following
+assumptions are adopted **explicitly, not silently** — labelled as assumptions, not decisions, and
+reversible the moment a real answer arrives. The spec's AC/API/vocabulary changes in this revision
+are built against these, and are named as such everywhere they apply.
+
+- **Q07 working assumption (downstream applicability):** each downstream step applies whenever the
+  submitted request actually changes the value that step is about — organisational-information
+  update always applies (every transfer changes org placement by definition); Payroll applies when
+  the request changes department/business unit or role; IT applies when it changes department/
+  business unit or location; Facilities applies when it changes location. This is grounded only in
+  the fields the request already collects, not in any invented business process, and is the
+  narrowest assumption that lets AC10/AC11/AC18 be specified without guessing an approval
+  workflow the source doesn't describe.
+- **Q08 working assumption (rejection/rollback):** a Manager or HR rejection is terminal — no
+  downstream step is triggered once that non-approved state is reached (nothing to roll back,
+  since nothing downstream has started). If a downstream step later reports it cannot be
+  completed, the request surfaces an explicit "pending resolution" status to the employee rather
+  than silently failing, auto-retrying, or auto-escalating — none of which the source confirms, so
+  the conservative default is a flagged-for-human-follow-up state, not an invented automated
+  recovery process.
+
+Both assumptions are also recorded in `specs/emp-internal-transfer.spec.md`'s Open Decisions table,
+against the AC/API they now unblock.
 
 ## Dependencies / integrations
 
@@ -175,10 +207,18 @@ silently included:
   the request.
 - Any transfer type other than internal transfer (e.g. external hire, contractor conversion).
 
-## Items that must be resolved before Gate 1
+## Items that must be resolved before Gate 1 (original) / before Gate 2 (updated 2026-09-08)
 
 At minimum, Q06/Q07/Q08/Q11 — these affect the request's core state machine and authorization
 model, which the spec's acceptance criteria cannot be written against without an answer or an
 explicitly scoped assumption the PM/reviewer accepts at Gate 1. Q01–Q05/Q09/Q10 can plausibly be
 carried into the spec as explicitly labelled assumptions if a reviewer accepts that framing, but
 must not be silently treated as decided.
+
+**Status after Gate 1 review and this revision:** Sourav Kumar Maity's review (2026-09-08)
+accepted controlled assumptions in lieu of confirmed answers for Q07 and Q08 (see Controlled
+Assumptions above) — these no longer block spec-level work, but remain **Open** for a real business
+decision before Gate 2 / production behaviour is finalised. Q06 and Q11 remain genuinely open
+(no assumption adopted) and, along with the two new items the review raised (Q12, Q13), should be
+resolved or explicitly assumption-scoped before the Day 5 technical plan is authored, since the
+plan cannot design a data model or RBAC scheme against an undefined authorization boundary.
