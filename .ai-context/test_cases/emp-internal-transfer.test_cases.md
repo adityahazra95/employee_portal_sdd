@@ -3,10 +3,14 @@
 **Spec:** [`.ai-context/specs/emp-internal-transfer.spec.md`](../specs/emp-internal-transfer.spec.md)
 **BRD:** [`BRD-001`](../BRD.md#brd-001-employee-internal-transfer-digital-journey)
 
-This file expands the spec's compact `UT01`–`UT17` table into broader QA/developer scenarios. It
+This file expands the spec's compact `UT01`–`UT18` table into broader QA/developer scenarios. It
 does not restate the specification — read the spec for Intent, full AC text, the API contract, and
-the Open Decisions this feature deliberately does not resolve (Q01–Q11 minus Q04/Q10, which don't
-gate any AC or scenario here). Every scenario below either maps to a spec AC/API or is explicitly
+the Open Decisions this feature deliberately does not resolve (Q01–Q13 minus Q04/Q10, which don't
+gate any AC or scenario here; Q05/Q07/Q08 are controlled assumptions, see `BRD.md`).
+
+> **Updated for spec v1.2.1** (Gate 1 Part 4, items P4-04/05/06/08): counts and API range brought
+> up to date, `hr_approved` removed as an expected result (it is transient, never returned), and
+> API04 / `pending_resolution` scenarios added. Every scenario below either maps to a spec AC/API or is explicitly
 marked as a **gap scenario** — a case worth testing once an open decision resolves, not something
 to implement against today.
 
@@ -14,13 +18,13 @@ to implement against today.
 
 ## 1. Unit / API scenarios
 
-Direct API-level exercises of `API01`–`API03`, beyond the compact `UT01`–`UT17` mapping.
+Direct API-level exercises of `API01`–`API04`, beyond the compact `UT01`–`UT18` mapping.
 
 | ID | Maps to | Scenario | Expected |
 |---|---|---|---|
 | `IT-API-01` | API01 / AC01 | `POST /transfer-requests` with a fully valid payload | `201`; response body matches the documented `data` shape exactly (no undocumented fields) |
 | `IT-API-02` | API02 / AC12, AC13 | `GET /transfer-requests/{id}` immediately after creation | `200`; `status: submitted`, `pendingWith: manager`, `stages[]` shows `manager_confirmation: pending` and the rest `not_applicable`/unset as appropriate |
-| `IT-API-03` | API03 / AC06, AC08 | Full happy-path walk: submit → manager approve → HR approve → (if downstream applies) mark steps complete → completed | Each `GET` between steps reflects the correct `status`/`pendingWith` for that point in the journey |
+| `IT-API-03` | API03, API04 / AC06, AC08, AC11, AC18 | Full happy-path walk: submit → manager approve (API03) → HR approve (API03) → if downstream steps apply, complete each via API04 → completed | Each `GET` between steps reflects the correct `status`/`pendingWith` for that point in the journey; after HR approve, `status` is `downstream_processing` or `completed`, never `hr_approved` |
 | `IT-API-04` | API01 | Response body of a successful create is checked against the JSON Schema implied by the spec's example | No extra fields (e.g. no internal database id, no other employee's data) |
 
 ## 2. Validation and boundary tests
@@ -41,14 +45,16 @@ Direct API-level exercises of `API01`–`API03`, beyond the compact `UT01`–`UT
 
 | ID | Maps to | Scenario | Expected |
 |---|---|---|---|
-| `AUTH-01` | API01/02/03 | Call each endpoint with no credentials | `401 unauthenticated` on all three |
-| `AUTH-02` | API01/02/03 | Call each endpoint with expired/invalid credentials | `401 unauthenticated` |
+| `AUTH-01` | API01/02/03/04 | Call each endpoint with no credentials | `401 unauthenticated` on all four |
+| `AUTH-02` | API01/02/03/04 | Call each endpoint with expired/invalid credentials | `401 unauthenticated` |
 | `AUTH-03` | AC14 | Employee A authenticated, requests Employee B's `transferRequestId` via API02 | `403 forbidden`; no leakage of B's data in the error body |
 | `AUTH-04` | AC15 | A manager who does **not** manage the requesting employee calls API03 while `pendingWith: manager` | `403 forbidden_wrong_stakeholder` |
 | `AUTH-05` | AC16 | An employee without the HR role calls API03 while `pendingWith: hr` | `403 forbidden_wrong_stakeholder` |
 | `AUTH-06` | AC17 | A user with no relationship at all (not requester, not manager, not HR) calls API02 and API03 | `403` on both |
 | `AUTH-07` | AC15/AC16 | The *correct* manager acts while `pendingWith: hr` (wrong stage for their role) | `403 forbidden_wrong_stakeholder` — being *a* valid manager somewhere is not being *the* stakeholder for the currently pending stage |
 | `AUTH-08` | — gap (Q11) | Delegation/out-of-office coverage — a stand-in manager acts on behalf of the assigned manager | **Gap scenario.** Q11 (RBAC resolution mechanism) is open; no delegation behaviour is specified. Test once resolved |
+| `AUTH-09` | API04 / AC18 | A caller who does not hold the role responsible for `{step}` calls API04 on an applicable, pending step | `403 forbidden_wrong_stakeholder`; step unchanged. *Which* real role maps to each step is Q11 (open) — use a stubbed role mapping |
+| `AUTH-10` | API04 | The responsible stakeholder calls API04 for a `{step}` that does not apply to this request | `404 not_found`; response identical to an unknown request ID, so it doesn't reveal which steps apply |
 
 ## 4. State-transition tests
 
@@ -56,12 +62,17 @@ Direct API-level exercises of `API01`–`API03`, beyond the compact `UT01`–`UT
 |---|---|---|---|
 | `STATE-01` | AC06 | Manager approves a `submitted` request | `status → manager_approved`, `pendingWith → hr` |
 | `STATE-02` | AC07 | Manager declines a `submitted` request | `status → manager_declined`, `pendingWith → none`, terminal |
-| `STATE-03` | AC08 | HR approves a `manager_approved` request | `status → hr_approved` |
+| `STATE-03` | AC08 | HR approves a `manager_approved` request (parameterised: ≥1 downstream step applies / none apply, stubbed per UT08) | `status → downstream_processing` (≥1 step applies) or `status → completed` (none apply); never `hr_approved` |
 | `STATE-04` | AC09 | HR declines a `manager_approved` request | `status → hr_declined`, `pendingWith → none`, terminal |
-| `STATE-05` | AC11 | All applicable downstream steps complete on an `hr_approved`/`downstream_processing` request | `status → completed`, terminal |
+| `STATE-05` | AC11, AC18 | A `downstream_processing` request's last remaining applicable step is completed via API04 | `status → completed`, `pendingWith → none`, terminal |
 | `STATE-06` | API03 exceptions | HR attempts API03 on a request still `submitted` (manager hasn't acted) | `409 invalid_state_transition` |
 | `STATE-07` | API03 exceptions | Any actor attempts API03 on a `manager_declined`, `hr_declined`, or `completed` (terminal) request | `409 invalid_state_transition` |
 | `STATE-08` | API03 exceptions | Manager attempts to act a second time on a request already `manager_approved` or `manager_declined` | `409 invalid_state_transition` (state has already moved past their stage) |
+| `STATE-09` | API04 / AC18 | A step that is not the last applicable one is completed via API04 | That step → `complete`; `status` stays `downstream_processing`; remaining steps still `pending` |
+| `STATE-10` | API04 exceptions | API04 is called for a step that is already `complete` | `409 invalid_state_transition`; no state change |
+| `STATE-11` | API04 exceptions | API04 is called while the request is not in `downstream_processing` (e.g. still `manager_approved`, or already `completed`) | `409 invalid_state_transition`; no state change |
+| `STATE-12` | API04 / AC18, AC11 (P4-08a) | A step in `pending_resolution` is completed via API04 by its responsible stakeholder | Step → `complete`; request → `completed` if it was the last applicable step, otherwise stays `downstream_processing` |
+| `STATE-13` | — gap (Q08 entry mechanism) (P4-08b) | A downstream step enters `pending_resolution` | **Gap scenario.** How a step enters this state is not defined (spec Contract Gap), so it can't be triggered through the API yet. Seed the state directly for STATE-12. Once the mechanism exists, assert: step → `pending_resolution`, request stays `downstream_processing` (not failed, not terminal), `pendingWith` unchanged |
 
 ## 5. Concurrency tests
 
@@ -72,7 +83,7 @@ the `already_processed` vs. `invalid_state_transition` distinction API03 defines
 | ID | Maps to | Scenario | Expected |
 |---|---|---|---|
 | `CONC-01` | API03 exceptions | Two near-simultaneous requests both attempt to be "the manager who approves" the same `submitted` request | Exactly one succeeds (`200`, state moves to `manager_approved`); the other receives `409 already_processed` |
-| `CONC-02` | API03 exceptions | A manager submits `decision: approve` while, unknown to them, HR has already been notified is impossible in this flow — but a manager submits `decision: approve` twice in quick succession (double-click) | First succeeds; second receives `409 already_processed` or `409 invalid_state_transition` depending on timing, never a silent duplicate state change |
+| `CONC-02` | API03 exceptions | A manager submits `decision: approve` twice in quick succession (double-click) | First succeeds; second receives `409 already_processed` or `409 invalid_state_transition` depending on timing, never a silent duplicate state change |
 | `CONC-03` | — gap (Q03) | Employee attempts to submit a second `POST /transfer-requests` while one is already active | **Gap scenario.** Q03 is open — document actual behaviour (likely: a second record is simply created, since no protection is implemented) and flag it back to BRD.md, don't treat either outcome as a pass/fail today |
 
 ## 6. Laravel API contract tests
@@ -82,7 +93,7 @@ these are contract/shape tests, not business-logic re-tests already covered abov
 
 | ID | Scenario | Expected |
 |---|---|---|
-| `CONTRACT-01` | Every success response from API01/02/03 | Matches the documented `data` shape field-for-field; no extra or missing keys |
+| `CONTRACT-01` | Every success response from API01/02/03/04 | Matches the documented `data` shape field-for-field; no extra or missing keys |
 | `CONTRACT-02` | Every error response | Matches the shared error envelope (`error.errorCode`, `error.message`, optional `error.errors[]`) |
 | `CONTRACT-03` | Any `errorCode` value returned by the running implementation | Is one of the stable values this spec defines; a new/undocumented `errorCode` is a spec gap, not a silent addition |
 | `CONTRACT-04` | Response headers on every endpoint | `Content-Type: application/json`; no internal headers (e.g. framework version) leaked |
@@ -94,12 +105,13 @@ these are contract/shape tests, not business-logic re-tests already covered abov
 |---|---|---|
 | `FE-01` | Submit the transfer request form with all fields valid | Frontend calls API01, shows a success state, and navigates to/renders the status view using API02's `data` shape directly (no client recomputation of `status`) |
 | `FE-02` | Submit with a required field missing | Frontend surfaces the exact field(s) named in `errors[]` next to the corresponding input, without inventing its own duplicate validation message |
-| `FE-03` | Status view renders for each of the 7 `status` enum values | Each renders a distinct, recognisable UI state; an unrecognised `status` value renders an explicit "unexpected state" indicator, not a blank screen |
+| `FE-03` | Status view renders for each of the 6 returnable `status` values (`hr_approved` is transient and never returned) | Each renders a distinct, recognisable UI state; an unrecognised `status` value (including `hr_approved`, if it ever appeared) renders an explicit "unexpected state" indicator, not a blank screen |
 | `FE-04` | Manager/HR viewing a request where `pendingWith` is not their stage | The UI does not present an approve/decline control for a stage that isn't theirs to act on (courtesy only — see FE-08 for the enforcement check) |
 | `FE-05` | API call returns `401` | Frontend redirects to sign-in / re-auth flow, not a raw error dump |
 | `FE-06` | API call returns `403` | Frontend shows an authorization-appropriate message, not the raw `errorCode` string |
 | `FE-07` | API call returns `500` | Frontend shows a generic failure state; no internals from the response are rendered |
 | `FE-08` | A user manipulates the client (e.g. browser devtools) to invoke an action the UI hid per FE-04 | API03 still independently rejects it (`403 forbidden_wrong_stakeholder`) — proves the frontend never became the enforcement point |
+| `FE-09` | A downstream step shows `pending_resolution` in `stages[].steps[]` | Rendered as a distinct "needs attention" state — not identical to a plain `pending` step, and not as an error the user caused. The overall request still reads as in progress (`downstream_processing`) |
 
 ## 8. Loading / error / empty-state UI scenarios
 
@@ -108,7 +120,7 @@ these are contract/shape tests, not business-logic re-tests already covered abov
 | `UI-01` | Form submission in flight | Submit control shows a busy/disabled state; no double-submit possible from a repeated click |
 | `UI-02` | Status view while API02 request is in flight | A loading placeholder, not a blank or stale-data flash |
 | `UI-03` | Status view for a request with no downstream steps applicable | `stages[].steps[]` empty/`not_applicable` renders as "no further steps," not as a loading state that never resolves |
-| `UI-04` | Any of the three endpoints times out or the network fails | A distinct "couldn't reach the server" state, separate from a `500` from the server itself |
+| `UI-04` | Any of the four endpoints times out or the network fails | A distinct "couldn't reach the server" state, separate from a `500` from the server itself |
 
 ## 9. Accessibility / form interaction checks
 

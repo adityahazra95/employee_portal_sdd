@@ -4,7 +4,7 @@
 `emp-internal-transfer`
 
 ## Status
-`Draft v1.2 — Gate 1 re-review (Part 4, 2026-09-30): Changes Requested (minor) — fix items P4-01…P4-09, resubmit as v1.2.1`
+`Draft v1.2.1 — In Peer Review (Gate 1 re-review)`
 
 ## Gate 1 Review
 **Author:** Aditya Hazra (SDD Developer) · **Gate 1 Reviewer:** Sourav Kumar Maity · **Review Date:** 2026-09-15
@@ -31,6 +31,11 @@ open decisions in this document.
 > mechanical consistency items (P4-01…P4-09) and answers the four questions in the reviewer
 > guidance below. It uses the binary Blueprint §12.3 decision state, not a "pass with conditions"
 > label. Once the items are fixed and verified, the next decision will be a plain `Approved`.
+>
+> **2026-09-30 — v1.2.1 addresses P4-01…P4-09.** See "Revision Notes v1.2.1" immediately after the
+> Part 4 review below: one row per item, a few same-class extras found while fixing them, and a
+> line-by-line check against the Part 4 approval checklist. Status bumped to `Draft v1.2.1`. Still
+> **not Approved** until the reviewer records it.
 
 ### Reviewer guidance for the v1.2 re-review (author's request, 2026-09-30)
 
@@ -438,6 +443,41 @@ verified the next decision will be **`Approved`**.
 - [ ] Q05, Q07 and Q08 are labelled controlled assumptions; Q06, Q11, Q12 and Q13 remain open.
 - [ ] A "Revision Notes v1.2.1" row exists for each of P4-01…P4-09.
 
+## Revision Notes v1.2.1 — Response to Gate 1 Re-Review (Part 4, 2026-09-30)
+
+Every item was checked against the file before fixing; all nine were accurate. P4-01…P4-06 and
+P4-08 were gaps the author left in v1.2: `hr_approved` was only removed from `UT08`, and the
+test-cases file hadn't been updated since Day 3. P4-07 fixed a real logic hole v1.2 introduced.
+
+| ID | Disposition |
+|---|---|
+| P4-01 | **Fixed** — API02's `status` enumeration is now `submitted \| manager_approved \| manager_declined \| hr_declined \| downstream_processing \| completed`. `hr_approved` stays in the status vocabulary only, marked transient |
+| P4-02 | **Fixed** — `UT05` Expected: approve → `downstream_processing` or `completed` (see UT08); decline → `hr_declined`; never `hr_approved` |
+| P4-03 | **Fixed** — `UT10` now starts from a `downstream_processing` request |
+| P4-04 | **Fixed** — test-cases intro and §1 intro say `UT01`–`UT18` / `API01`–`API04`. Same class, also fixed: intro's open-item range Q01–Q11 → Q01–Q13 (with Q05/Q07/Q08 labelled controlled assumptions); `AUTH-01`/`AUTH-02`, `CONTRACT-01`, `UI-04` now cover four endpoints; `IT-API-03`'s happy path now includes API04 |
+| P4-05 | **Fixed** — `STATE-03` expects `downstream_processing` (≥1 step applies) or `completed` (none apply), parameterised and stubbed per UT08; never `hr_approved` |
+| P4-06 | **Fixed** — `STATE-05` starts from `downstream_processing`; the last applicable step is completed via API04 → `completed`, `pendingWith: none`; maps to AC11, AC18 |
+| P4-07 | **Fixed** — API04's path parameter accepts steps in `pending` **or** `pending_resolution`, which gives that state a defined exit; the entry mechanism stays a Contract Gap. Carried through consistently: `AC18`'s Given now says "pending or pending_resolution", and `UT18` is parameterised over prior step status (`pending` / `pending_resolution`). Also removed a duplicate condition: API04's 404 and 409 rows both claimed "step never applicable"; it is now 404 only, as P4-08 specifies |
+| P4-08 | **Fixed** — (a) `STATE-12`: completing a `pending_resolution` step via API04. (b) `STATE-13`: gap scenario for *entering* `pending_resolution` (not testable until the mechanism exists; asserts the request stays `downstream_processing`). Optional API04 rows added too: `AUTH-09` (wrong stakeholder → 403), `AUTH-10` (step not applicable → 404), `STATE-09` (non-last step → still `downstream_processing`), `STATE-10` (already complete → 409), `STATE-11` (request not in `downstream_processing` → 409) |
+| P4-09 | **Recorded as a Contract Gap** — `pendingWith` is single-valued while several downstream steps can be pending at once; `stages[].steps[]` is the authoritative per-step view. Day 5 decision; non-blocking |
+| *(same class, not listed)* | **Fixed** — API03 now has an explicit "resulting `status` by action" table, so its HR-approve result is stated directly and matches AC08/UT05/UT08/`STATE-03` (checklist item 2 names API03). Test cases `FE-03` said "7 `status` enum values"; only 6 are returnable now, so it's corrected. Added `FE-09` for the `pending_resolution` display state the Next.js contract already requires. Removed a garbled sentence from `CONC-02` |
+
+**Checked against the Part 4 approval checklist:**
+
+- [x] `hr_approved` appears only in the status vocabulary and historical/review text, never as a
+      returned value or an expected test result. *(Searched both files. The remaining hits are the
+      vocabulary row and its v1.1 note, review quotes, revision notes, and "never `hr_approved`"
+      assertions.)*
+- [x] AC08, API03's HR-approve result, UT05, UT08 and STATE-03 all state the same post-HR-approval
+      state: `downstream_processing` or `completed`.
+- [x] 18 ACs / 18 UTs / API01–API04 are stated consistently in the spec and test-cases file.
+- [x] A `pending_resolution` step has a defined exit (API04), and both the entry mechanism and the
+      `pendingWith` multi-step point are recorded as Contract Gaps.
+- [x] Q05, Q07 and Q08 are labelled controlled assumptions; Q06, Q11, Q12 and Q13 remain open.
+- [x] A "Revision Notes v1.2.1" row exists for each of P4-01…P4-09.
+
+These ticks are the author's self-check. The Gate 1 decision is still the reviewer's.
+
 ## Linked BRD
 [`.ai-context/BRD.md#brd-001-employee-internal-transfer-digital-journey`](../BRD.md#brd-001-employee-internal-transfer-digital-journey)
 
@@ -606,7 +646,7 @@ step, so the two possible next states are `downstream_processing` (steps apply) 
   {
     "data": {
       "transferRequestId": "string",
-      "status": "submitted | manager_approved | manager_declined | hr_approved | hr_declined | downstream_processing | completed",
+      "status": "submitted | manager_approved | manager_declined | hr_declined | downstream_processing | completed",
       "pendingWith": "manager | hr | org_info | payroll | it | facilities | none",
       "targetDepartmentId": "string",
       "targetLocationId": "string",
@@ -678,7 +718,15 @@ step, so the two possible next states are `downstream_processing` (steps apply) 
   rather than inventing stage-specific verbs, since the BRD does not require different ones.
 
 - **Success — `200 OK`:** same `data` shape as API02, reflecting the new `status`, `pendingWith`,
-  and `stages`.
+  and `stages`. Resulting `status` by action (v1.2.1 — stated explicitly so it matches AC08, UT05,
+  UT08 and `STATE-03`):
+
+  | Stage acted on | `decision` | Resulting `status` |
+  |---|---|---|
+  | Manager | `approve` | `manager_approved` |
+  | Manager | `decline` | `manager_declined` |
+  | HR | `approve` | `downstream_processing` if ≥1 downstream step applies (Q07 assumption), otherwise `completed` — **never `hr_approved`**, which is transient only |
+  | HR | `decline` | `hr_declined` |
 - **Exceptions:**
 
   | HTTP | `errorCode` | Condition | Safe response behaviour |
@@ -710,7 +758,12 @@ step, so the two possible next states are `downstream_processing` (steps apply) 
   actors as well as manager/HR. The mechanism below is authoritative regardless of how that mapping
   is eventually resolved.
 - **Path parameter:** `step` — one of `org_info | payroll | it | facilities`; must be a step this
-  request currently has in `pending` status (per API02's `stages[].steps[]`).
+  request currently has in `pending` **or `pending_resolution`** status (per API02's
+  `stages[].steps[]`). Accepting `pending_resolution` (v1.2.1, P4-07) gives that state a defined
+  exit: once the problem is resolved outside the system, the responsible stakeholder completes the
+  step through this same endpoint. Without it a `pending_resolution` step could never finish, and
+  the request could never reach `completed` (AC11). This defines the **exit only** — how a step
+  *enters* `pending_resolution` is still a Contract Gap.
 - **Request payload:** none — this is a pure state-transition action, no business data to submit.
 - **Success — `200 OK`:** same `data` shape as API02/API03. That step's entry in `stages[].steps[]`
   moves to `complete`. The server then re-evaluates: if every applicable step is now complete, the
@@ -722,7 +775,7 @@ step, so the two possible next states are `downstream_processing` (steps apply) 
   | 401 | `unauthenticated` | No valid credentials presented | No information revealed |
   | 403 | `forbidden_wrong_stakeholder` | Authenticated, but caller does not hold the role responsible for `{step}` | Generic message; no state change |
   | 404 | `not_found` | No transfer request exists with the given ID, **or** `{step}` is not a step this request has (e.g. it was never applicable) | Identical response for both — does not reveal which steps apply to a request the caller isn't authorized to act on |
-  | 409 | `invalid_state_transition` | The request is not in `downstream_processing`, or `{step}` is already `complete`, or `{step}` was never marked applicable for this request | No state change |
+  | 409 | `invalid_state_transition` | The request is not in `downstream_processing`, or `{step}` is already `complete` | No state change |
   | 429 | `rate_limited` | *(shape only — no threshold decided yet)* | As API01 |
   | 500 | `internal_error` | Unexpected server failure | Generic message only |
 
@@ -738,7 +791,8 @@ step, so the two possible next states are `downstream_processing` (steps apply) 
 | Identity/role mapping for who holds the `org_info`/`payroll`/`it`/`facilities` responsibility API04 checks against | Q11 (extended, 2026-09-08) — the completion *mechanism* is now defined (API04); *who* is authorized is not |
 | Any endpoint for the manager/HR/Payroll/IT/Facilities side beyond API03's decision shape and API04's single completion action (e.g. a bulk queue view for HR, a Payroll dashboard) | Out of scope per the spec's "Explicitly Out of Scope" — no dedicated stakeholder interfaces are defined |
 | Withdrawal/cancellation endpoint | Q09 is open and withdrawal is explicitly Out of Scope |
-| Mechanism that sets a downstream step's status to `pending_resolution` (added v1.2) | Who decides a step "cannot be completed," on what basis, and whether it's a stakeholder action or an operational/manual process, is not specified by the BRD's Q08 assumption in enough detail to define an endpoint here — the *value* is modeled (see API02's response shape) so the contract is honest that this state exists; the mechanism producing it is a Day 5 gap |
+| Mechanism that sets a downstream step's status to `pending_resolution` (added v1.2) | Who decides a step "cannot be completed," on what basis, and whether it's a stakeholder action or an operational/manual process, is not specified by the BRD's Q08 assumption in enough detail to define an endpoint here — the *value* is modeled (see API02's response shape) so the contract is honest that this state exists; the mechanism producing it is a Day 5 gap. The **exit** is defined (v1.2.1): API04 completes a `pending_resolution` step |
+| `pendingWith` is single-valued, but several downstream steps can be pending at once (added v1.2.1, P4-09) | Which step `pendingWith` names while two or more are pending is undefined. `stages[].steps[]` is the authoritative per-step view; the frontend should render that for downstream progress, not rely on `pendingWith` alone. Whether `pendingWith` should become a list, name a "first" step by some ordering, or read `downstream` generically is a Day 5 decision. Does not block Gate 1 |
 
 ### Error Contract
 
@@ -777,7 +831,9 @@ What the frontend can rely on, without reimplementing any authoritative rule its
   only the same status-view components already used for API02/API03.
 - **`status` and `pendingWith` are a closed, stable enumeration** (see the vocabulary table above).
   The frontend may switch UI on these string values but must treat an unrecognised value as an
-  unexpected/error display state, not silently ignore it.
+  unexpected/error display state, not silently ignore it. `hr_approved` is in the vocabulary but is
+  transient and **never returned** (API02 lists the six returnable values), so the frontend needs
+  no display state for it.
 - **Validation errors** (`validation_error`, `invalid_reference_data`) arrive with a field-level
   `errors[]` the form binds directly to; the frontend does not duplicate field-validity rules
   beyond basic input ergonomics (e.g. a date picker), since `.agent/rules/int-standards.nextjs.md`
@@ -1016,6 +1072,7 @@ Then the system denies the attempt
 **AC18 — Downstream stakeholder marks their step complete**
 ```gherkin
 Given a transfer request in downstream_processing with a step that applies to it and is pending
+  or pending_resolution
 When the stakeholder responsible for that step marks it complete
 Then that step's status updates to complete
 And the system re-evaluates whether every applicable step is now complete
@@ -1141,12 +1198,12 @@ directly from its AC's Given/When/Then — none introduces a scenario the AC doe
 | `emp-internal-transfer.UT02` | AC02 | Submit with every required field but no `reason` | `201`; `reason` is `null`, not defaulted |
 | `emp-internal-transfer.UT03` | AC03 | Submit missing one required field (parameterised over each of the 4 required fields) | `400 validation_error`; `errors[]` names the missing field; no record created |
 | `emp-internal-transfer.UT04` | AC04 | Submit with a `targetDepartmentId`/`targetLocationId`/`targetRoleId` that doesn't reference a valid selectable option (parameterised over each of the 3 fields) | `400 invalid_reference_data`; `errors[]` names the invalid field; no record created |
-| `emp-internal-transfer.UT05` | AC05 | HR calls API03 on a `manager_approved` request with `decision: approve` or `decision: decline` | `200`; status becomes `hr_approved` or `hr_declined` respectively; no assertion made about *which* decision is "correct" — this UT only proves the gate produces a recorded decision |
+| `emp-internal-transfer.UT05` | AC05 | HR calls API03 on a `manager_approved` request with `decision: approve` or `decision: decline` | `200`; on approve, status becomes `downstream_processing` or `completed` (see UT08); on decline, `hr_declined`; never `hr_approved`. No assertion made about *which* decision is "correct" — this UT only proves the gate produces a recorded decision |
 | `emp-internal-transfer.UT06` | AC06 | Manager calls API03 on a `submitted` request with `decision: approve` | `200`; `status: manager_approved`; `pendingWith: hr` |
 | `emp-internal-transfer.UT07` | AC07 | Manager calls API03 on a `submitted` request with `decision: decline` | `200`; `status: manager_declined`; `pendingWith: none`; a subsequent HR action attempt would hit `409 invalid_state_transition` (cross-check with UT16) |
 | `emp-internal-transfer.UT08` | AC08 | HR calls API03 on a `manager_approved` request with `decision: approve` (parameterised over both branches of the Q07 assumption: a request with at least one applicable downstream step, and one with none) | `200`; `status` transitions to `downstream_processing` (steps apply) or directly to `completed` (none apply) — **never observed as `hr_approved`**, which is transient only (see the status vocabulary); `pendingWith` reflects the next applicable stakeholder or `none` |
 | `emp-internal-transfer.UT09` | AC09 | HR calls API03 on a `manager_approved` request with `decision: decline` | `200`; `status: hr_declined`; `pendingWith: none` |
-| `emp-internal-transfer.UT10` | AC10 | GET API02 on an `hr_approved` request with applicable downstream steps | `200`; `stages[].steps[]` lists each applicable step individually as `pending` until completed |
+| `emp-internal-transfer.UT10` | AC10 | GET API02 on a `downstream_processing` request with applicable downstream steps | `200`; `stages[].steps[]` lists each applicable step individually as `pending` until completed |
 | `emp-internal-transfer.UT11` | AC11 | Every applicable downstream step for a request is marked complete | `status` transitions to `completed`; employee-facing response confirms completion |
 | `emp-internal-transfer.UT12` | AC12 | Requesting employee calls API02 at any status, including a terminal one (`completed`, `manager_declined`, `hr_declined`) | `200`; `status` field present and correct in every case, including terminal states |
 | `emp-internal-transfer.UT13` | AC13 | Requesting employee calls API02 while the request is in a non-terminal status | `200`; `pendingWith` field present and correct |
@@ -1154,7 +1211,7 @@ directly from its AC's Given/When/Then — none introduces a scenario the AC doe
 | `emp-internal-transfer.UT15` | AC15 | A manager who is not the request's employee's manager calls API03 while `pendingWith: manager` | `403 forbidden_wrong_stakeholder`; no state change |
 | `emp-internal-transfer.UT16` | AC16 | A caller without the HR role calls API03 while `pendingWith: hr` | `403 forbidden_wrong_stakeholder`; no state change |
 | `emp-internal-transfer.UT17` | AC17 | A caller with no relationship to the request (not requester/manager/HR) calls API02 or API03 | `403` (API02) / `403 forbidden_wrong_stakeholder` (API03); no data or state change |
-| `emp-internal-transfer.UT18` | AC18 | The stakeholder responsible for a pending, applicable downstream step calls API04 for that step | `200`; that step's status becomes `complete`; overall `status` becomes `completed` if it was the last applicable step, otherwise stays `downstream_processing` |
+| `emp-internal-transfer.UT18` | AC18 | The stakeholder responsible for an applicable downstream step calls API04 for that step (parameterised over the step's prior status: `pending` and `pending_resolution`) | `200`; that step's status becomes `complete` in both cases; overall `status` becomes `completed` if it was the last applicable step, otherwise stays `downstream_processing` |
 
 Boundary/negative coverage folded into the above rather than duplicated as separate IDs:
 UT03/UT04 are parameterised boundary+invalid-input cases; UT07/UT16 double as
