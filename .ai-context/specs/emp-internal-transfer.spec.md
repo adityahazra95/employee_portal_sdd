@@ -4,7 +4,7 @@
 `emp-internal-transfer`
 
 ## Status
-`Draft v1.1 — In Peer Review (Gate 1 re-review)`
+`Draft v1.1 — Gate 1 re-review returned PASS WITH MINOR CONDITIONS (2026-09-30); consistency fixes required — not yet Approved`
 
 ## Gate 1 Review
 **Author:** Aditya Hazra (SDD Developer) · **Gate 1 Reviewer:** Sourav Kumar Maity · **Review Date:** 2026-09-15
@@ -12,6 +12,15 @@
 The reviewer is not the author. This spec is not Approved until the reviewer above records a
 Gate 1 decision (Approved / Changes Requested) against the acceptance criteria, API contract, and
 open decisions in this document.
+
+> **2026-09-30 — linked BRD passed Gate 1.** Sourav Kumar Maity recorded **PASS** on the revised
+> `BRD.md` (verbatim in BRD.md's "Gate 1 Final Review Record"). That decision covers the BRD only.
+>
+> **2026-09-30 — spec v1.1 re-review returned `PASS WITH MINOR CONDITIONS`.** Recorded verbatim in
+> "Gate 1 Review Comments (Part 3 — v1.1 re-review)" below, just before "Linked BRD". It lists six
+> consistency/traceability conditions (two 🔴, two 🟠, two 🟡); none requires a redesign. As with the
+> earlier `PASS WITH CONDITIONS`, this is treated as **not yet Approved** for gating purposes.
+> `plans/`/`tasks/` stay blocked until the conditions are corrected and the reviewer records Approved.
 
 **Recorded decision: `PASS WITH CONDITIONS`.** This is the reviewer's own wording, not one of the
 two decision states this section otherwise defines. It is recorded verbatim below rather than
@@ -211,6 +220,122 @@ the assumptions themselves.
 | Part 2 #1 — Downstream processing completion mechanism | **Fixed** — new `AC18` and `API04` define who completes a downstream step and how; authorization identity remains Q11 (extended), the mechanism itself does not |
 | Part 2 #2 — State-transition model inconsistency | **Fixed** — the status vocabulary table and `AC08` now branch explicitly on whether any downstream step applies |
 | Part 2 #7 — Status-visibility scope (AC12) | **Fixed** — `AC12` no longer excludes completed/rejected requests; the source never stated that exclusion, and restricting it was this spec's own overreach, not a BRD rule |
+
+### Gate 1 Review Comments (Part 3 — v1.1 re-review) — Sourav Kumar Maity, 2026-09-30
+
+**Gate 1 decision (reviewer's words):** PASS WITH MINOR CONDITIONS. Recorded verbatim. For gating
+purposes, **not yet Approved**: the conditions below must be corrected first. The author has not
+yet dispositioned these items. The v1.1 "Revision Notes" table above covers Parts 1–2 only.
+
+> ## Overall Assessment: PASS WITH MINOR CONDITIONS
+>
+> The revised specification demonstrates good SDD discipline. The acceptance criteria are
+> individually identified, API contracts and spec-derived test cases are defined, downstream
+> completion has now been addressed through **API04 / AC18 / UT18**, and authorization and failure
+> scenarios are documented.
+>
+> Before progressing to the next SDD stage, the following consistency issues within the
+> specification should be corrected:
+>
+> ### 1. 🔴 AC08 / UT08 / Status Model Inconsistency
+>
+> **AC08** indicates that after HR approval the request should move to the appropriate downstream
+> processing state or directly to completed when no downstream step applies.
+>
+> However, **UT08 still expects `status: hr_approved`** after the HR approval action.
+>
+> Please align AC08, UT08, API03 response, and the status model so that the expected
+> post-HR-approval state is unambiguous.
+>
+> ### 2. 🔴 Traceability for AC11 Needs Updating
+>
+> The traceability table currently maps:
+>
+> > **AC11 → API03 (final transition) / API02**
+>
+> However, the revised specification introduces **API04** specifically for downstream stakeholder
+> completion, and **AC18 / UT18** now handle that action.
+>
+> The traceability should therefore clearly show the relationship between **AC11, AC18, API04, and
+> UT18**, rather than implying that API03 performs the final downstream completion transition.
+>
+> ### 3. 🟠 Stale "17 AC / 17 UT / API01–API03" References
+>
+> The specification has been revised to include **AC18, UT18 and API04**, but the self-review still
+> contains statements such as:
+>
+> - "All 17 ACs"
+> - "API01–API03"
+> - "All 17 UTs map 1:1 to the 17 ACs"
+>
+> These statements are now inconsistent with the current version of the specification.
+>
+> Please update the historical/self-review sections so the document consistently reflects the
+> current **18 AC / 18 UT / API01–API04** structure.
+>
+> ### 4. 🟠 Next.js Consumption Contract Should Include API04
+>
+> Since API04 is now part of the specification, the frontend/backend consumption contract should
+> explicitly clarify whether and how the API04 response/status changes are consumed by the
+> frontend.
+>
+> The current contract should not imply that API01–API03 are the complete set of APIs relevant to
+> the journey.
+>
+> ### 5. 🟡 `Q05` / Domestic Scope Representation Should Be Consistent
+>
+> The Open Decisions section identifies **Q05 — Geographic scope** as unresolved, while the
+> specification's Out-of-Scope treatment excludes cross-border transfers.
+>
+> If domestic-only scope is being used as a working assumption, it should be consistently
+> identified as a **controlled assumption**, rather than appearing as a confirmed business decision.
+>
+> ### 6. 🟡 Pending-Resolution State Requires Explicit Representation
+>
+> The specification refers to downstream failure handling and a human-resolution path, but the
+> status representation for a downstream failure/pending-resolution scenario should be explicitly
+> defined.
+>
+> Please clarify whether this requires a dedicated status such as `pending_resolution` or whether
+> it is represented through an existing status and the downstream step details.
+>
+> ## Positive Changes in the Current Specification
+>
+> - **API04** provides an implementable mechanism for downstream stakeholders to complete their
+>   individual steps.
+> - **AC18 / UT18** now provide explicit coverage for downstream step completion.
+> - Manager and HR decision flows are clearly separated.
+> - Authorization scenarios are covered through AC14–AC17 and corresponding tests.
+> - Acceptance criteria and unit tests are individually identifiable.
+> - The specification explicitly avoids implementing several unresolved business rules as
+>   confirmed rules.
+> - Confirmation events are now distinguished into submission acknowledgement, decision outcome,
+>   and final completion confirmation.
+> - Error responses and state-transition failures are documented.
+> - Frontend responsibility is separated from authoritative backend business rules.
+>
+> ## Gate 1 Recommendation
+>
+> **PASS WITH MINOR CONDITIONS**
+>
+> The specification is substantially complete for Gate 1. The remaining work is primarily
+> **internal consistency and traceability correction**, rather than a need to redesign the overall
+> specification.
+>
+> Once the above items are corrected—particularly the **AC08/UT08 status inconsistency, AC11/API04
+> traceability, and stale 17-item references**—the specification should be ready to proceed to the
+> **Technical Plan and Task Decomposition** stage.
+
+**Where each condition applies in v1.1 (checked when recording; not yet fixed):**
+
+| # | Confirmed at |
+|---|---|
+| 1 | UT08 (Unit Test Cases table) expects `status: hr_approved`; the status vocabulary marks `hr_approved` "Transient only" |
+| 2 | Traceability row "Journey stage 8" maps AC11 → `API03 (final transition) / API02`, UT11 only |
+| 3 | Unit Test Cases intro ("17 ACs → 17 UTs"); Day 3 self-review ("All 17 ACs", "API01–API03", "All 17 UTs map 1:1"); status vocabulary intro ("used consistently across all three endpoints") |
+| 4 | Next.js Consumption Contract names only API01/API02/API03 ("every one of the three endpoints") |
+| 5 | Open Decisions Q05 row says "cross-border excluded by default"; Out of Scope says "domestic transfers only" — neither is labelled a controlled assumption, and `BRD.md`'s Controlled Assumptions section covers Q07/Q08 only |
+| 6 | Status vocabulary has no failure/pending-resolution value; the BRD's Q08 assumption ("pending resolution") has no status or `stages[]` representation in the contract |
 
 ## Linked BRD
 [`.ai-context/BRD.md#brd-001-employee-internal-transfer-digital-journey`](../BRD.md#brd-001-employee-internal-transfer-digital-journey)

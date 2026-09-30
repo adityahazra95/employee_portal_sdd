@@ -247,3 +247,29 @@ mentions inside this project's own legitimate log entries (e.g. "Empty Floor" �
 where the name wasn't load-bearing information, without altering what each entry actually reports
 was done.
 **Follow-up:** None open.
+
+### 2026-09-30 — emp-internal-transfer.gate1-brd-final-review
+**Prompted by:** Sourav Kumar Maity (Gate 1 Reviewer)
+**Instruction (summary):** Record the Gate 1 final review of the revised `BRD.md` (decision: PASS).
+**Artefacts touched:** `.ai-context/BRD.md`, `.ai-context/specs/emp-internal-transfer.spec.md`,
+`.ai-context/status.md`, `.ai-context/prompt_history.md`
+**Outcome:** Review recorded verbatim at the end of `BRD.md`, plus a status line under its header.
+No Open Decisions row changed status. A pointer note was added to the spec's Gate 1 Review block
+saying the PASS covers the BRD only and the spec's v1.1 re-review is still pending. Updated the
+`status.md` programme, active-spec and baseline tables and added an execution log entry. No tests
+were run (documentation-only change).
+**Follow-up:** Spec-level Gate 1 re-review. Carry-forward Q06, Q07/Q08 (validate the controlled
+assumptions), Q11, Q12 and Q13 must stay explicitly open/assumed in the spec and test cases.
+
+### 2026-09-30 — emp-internal-transfer.gate1-spec-rereview
+**Prompted by:** Sourav Kumar Maity (Gate 1 Reviewer)
+**Instruction (summary):** Record the Gate 1 re-review of spec v1.1 (decision: PASS WITH MINOR
+CONDITIONS).
+**Artefacts touched:** `.ai-context/specs/emp-internal-transfer.spec.md`, `.ai-context/status.md`,
+`.ai-context/prompt_history.md`
+**Outcome:** Review recorded verbatim as "Gate 1 Review Comments (Part 3 — v1.1 re-review)".
+Updated the spec's Status line and Gate 1 pointer note, marking it not yet Approved. All six
+conditions were checked against the spec text and confirmed; a table in the spec shows where each
+applies. None was fixed here. No tests were run (documentation-only change).
+**Follow-up:** Developer fixes conditions 1–6 as v1.2 and resubmits for the reviewer to record
+Approved. Condition 5 may need a Q05 controlled-assumption entry added to `BRD.md`.

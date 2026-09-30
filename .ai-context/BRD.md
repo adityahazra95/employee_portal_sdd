@@ -15,6 +15,11 @@ sponsor — there is no separate FRS/journey-map document set the way the archiv
 
 **Owner:** TBD (no PM assigned) · **Status legend:** `Open` · `Decided` · `Superseded`
 
+**Gate 1 (BRD level): PASS** — Sourav Kumar Maity, 2026-09-30, for progression to the next SDD
+stage. Carry-forward items Q06, Q07/Q08 (controlled assumptions), Q11, Q12, Q13 remain open — see
+[Gate 1 Final Review Record](#gate-1-final-review-record--brd-2026-09-30) at the end of this file.
+This PASS covers the BRD only; the spec's own Gate 1 re-review is separate and still pending.
+
 ---
 
 ## Discovery rule applied to this BRD
@@ -222,3 +227,65 @@ decision before Gate 2 / production behaviour is finalised. Q06 and Q11 remain g
 (no assumption adopted) and, along with the two new items the review raised (Q12, Q13), should be
 resolved or explicitly assumption-scoped before the Day 5 technical plan is authored, since the
 plan cannot design a data model or RBAC scheme against an undefined authorization boundary.
+
+---
+
+## Gate 1 Final Review Record — BRD, 2026-09-30
+
+**Reviewer:** Sourav Kumar Maity · **Author:** Aditya Hazra · **Decision:** `PASS` (BRD level)
+
+Recorded verbatim below. This decision applies to `BRD.md` only. It does not approve
+`specs/emp-internal-transfer.spec.md`. The reviewer states that the next review will check that
+the items below are correctly reflected in the spec's API contracts, state transitions, acceptance
+criteria, authorization model, downstream processing, and test cases. Until the spec itself is
+Approved, `plans/`/`tasks/` stay blocked.
+
+> **Overall Assessment: PASS**
+>
+> Thank you for incorporating the previous Gate 1 feedback. I have reviewed the revised BRD against
+> the earlier observations, and the major business-logic and discovery gaps have been addressed
+> appropriately.
+>
+> **Key Improvements Confirmed**
+>
+> - The downstream applicability rule (Q07) is now explicitly documented as a **controlled
+>   assumption**, including applicability for Org Info, Payroll, IT, and Facilities.
+> - Rejection and downstream failure handling (Q08) are now explicitly addressed without
+>   introducing unsupported automated recovery behaviour.
+> - Manager → HR sequencing has been captured as an explicit open business decision (Q12), rather
+>   than being treated as an unconfirmed business rule.
+> - RBAC/authorization scope (Q11) has been expanded to include downstream stakeholders.
+> - The rule governing selectable Department, Location, and Role values has been identified as an
+>   explicit open decision (Q13).
+> - Business decisions and technical implementation decisions are clearly separated.
+> - The BRD maintains good traceability to the source assessment document and avoids silently
+>   converting unspecified requirements into confirmed business rules.
+>
+> **Carry-Forward Items**
+>
+> The following items can remain open for the next SDD stage, but must continue to be explicitly
+> identified as assumptions/open decisions:
+>
+> - Q06 — Ownership of the organisational-information update.
+> - Q11 — Detailed actor authorization/delegation model.
+> - Q12 — Whether Manager and HR processing must be strictly sequential or may happen in parallel.
+> - Q13 — Rules/source for valid Department, Location, and Role selections.
+> - Q07/Q08 — The current controlled assumptions should be validated before final production
+>   behaviour is confirmed.
+>
+> **Final Recommendation**
+>
+> **BRD: PASS for progression to the next SDD stage.**
+>
+> The revised BRD now provides a sufficiently clear business foundation for the specification. The
+> developer can proceed with the specification/technical planning while maintaining explicit
+> traceability to the remaining open decisions and controlled assumptions.
+>
+> For the next review, I will specifically verify that these BRD assumptions/open decisions are
+> correctly reflected in the **API contracts, state transitions, acceptance criteria, authorization
+> model, downstream processing, and test cases**, without introducing new unsupported business
+> rules.
+
+**Effect on Open Decisions table:** none of Q06/Q07/Q08/Q11/Q12/Q13 changes status. All stay
+`Open`, as the reviewer requires. Q07/Q08 keep their controlled assumptions, which must be
+validated before production behaviour is confirmed.
