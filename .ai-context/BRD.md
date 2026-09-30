@@ -20,6 +20,10 @@ stage. Carry-forward items Q06, Q07/Q08 (controlled assumptions), Q11, Q12, Q13 
 [Gate 1 Final Review Record](#gate-1-final-review-record--brd-2026-09-30) at the end of this file.
 This PASS covers the BRD only; the spec's own Gate 1 re-review is separate and still pending.
 
+> **For the v1.2 spec re-review (2026-09-30):** the only change to this file since the PASS above is
+> adding **Q05** to the "Controlled Assumptions" section (spec condition 5). Nothing else here needs
+> re-review. See the spec's "Reviewer guidance for the v1.2 re-review" for the full checklist.
+
 ---
 
 ## Discovery rule applied to this BRD
@@ -147,14 +151,14 @@ that depends on it can be Approved.
 | Q12 | Whether Manager confirmation and HR eligibility validation must happen strictly in sequence (HR only begins once Manager has approved), or may happen in parallel | **Raised by Gate 1 review (Sourav Kumar Maity, 2026-09-08)** — the source presents the two steps in sequence but does not state whether that ordering is an enforced rule or incidental listing order | PM/HR (TBD) | The spec's AC06–AC09 currently model this as strictly sequential as a working assumption (see Business decisions below) — confirm or revise before Gate 2 |
 | Q13 | What determines the valid/selectable set of departments, locations, and roles a given employee may choose from when submitting a request (e.g. full org-wide list, filtered by an eligibility rule, sourced from an HRIS/org chart) | **Raised by Gate 1 review (Sourav Kumar Maity, 2026-09-08)** — not in source | HR/IT system owner (TBD) | Blocks the spec's AC04 "valid selectable option" concept and the reference-data API contract gap |
 
-## Controlled Assumptions Adopted for Spec v1.1 (Gate 1 revision, 2026-09-08)
+## Controlled Assumptions Adopted for Spec v1.1/v1.2 (Gate 1 revisions, 2026-09-08 / 2026-09-30)
 
 Sourav Kumar Maity's Gate 1 review (Part 2, observation 3) explicitly invited either a confirmed
 business rule for Q07, or "the controlled assumption to be used for the next SDD stage." No
-stakeholder is available to confirm Q07 or Q08 in this assessment context, so the following
+stakeholder is available to confirm Q07, Q08, or Q05 in this assessment context, so the following
 assumptions are adopted **explicitly, not silently** — labelled as assumptions, not decisions, and
-reversible the moment a real answer arrives. The spec's AC/API/vocabulary changes in this revision
-are built against these, and are named as such everywhere they apply.
+reversible the moment a real answer arrives. The spec's AC/API/vocabulary changes are built against
+these, and are named as such everywhere they apply.
 
 - **Q07 working assumption (downstream applicability):** each downstream step applies whenever the
   submitted request actually changes the value that step is about — organisational-information
@@ -171,8 +175,13 @@ are built against these, and are named as such everywhere they apply.
   than silently failing, auto-retrying, or auto-escalating — none of which the source confirms, so
   the conservative default is a flagged-for-human-follow-up state, not an invented automated
   recovery process.
+- **Q05 working assumption (geographic scope, added v1.2):** this spec covers domestic transfers
+  only. Flagged by the reviewer as needing the same explicit-assumption treatment as Q07/Q08,
+  rather than reading as a quietly confirmed decision — the source document never states whether
+  cross-border/relocation transfers are in scope, and "domestic-only" was previously written as if
+  it were settled.
 
-Both assumptions are also recorded in `specs/emp-internal-transfer.spec.md`'s Open Decisions table,
+All three assumptions are also recorded in `specs/emp-internal-transfer.spec.md`'s Open Decisions table,
 against the AC/API they now unblock.
 
 ## Dependencies / integrations
