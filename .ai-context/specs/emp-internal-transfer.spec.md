@@ -4,7 +4,7 @@
 `emp-internal-transfer`
 
 ## Status
-`Gate 1 — Pass with Conditions (revision required before re-review)`
+`Draft v1.1 — In Peer Review (Gate 1 re-review)`
 
 ## Gate 1 Review
 **Author:** Aditya Hazra (SDD Developer) · **Gate 1 Reviewer:** Sourav Kumar Maity · **Review Date:** 2026-09-15
@@ -190,6 +190,28 @@ downstream applicability, sequencing, and authorization questions before moving 
 Plan and Task Decomposition. Please update the specification and associated BRD/open-decision items
 where required, then submit the revised version for Gate 1 re-review."
 
+## Revision Notes — Response to Gate 1 Review (v1.1, 2026-09-08)
+
+Point-by-point disposition of every observation from both review passes above. Nothing here
+silently resolves a business question that genuinely needs a stakeholder — where no confirmed
+answer was available, an explicitly labelled controlled assumption was adopted instead, per the
+reviewer's own Part 2 instruction ("obtain/record the business rule... or explicitly document the
+controlled assumption"). See `BRD.md`'s "Controlled Assumptions Adopted for Spec v1.1" section for
+the assumptions themselves.
+
+| Review item | Disposition |
+|---|---|
+| Part 1 #1 / Part 2 #3 — Conditional downstream activities (Q07) | **Controlled assumption adopted** — see BRD.md; AC10/AC11/AC18 now specify against it explicitly, not silently |
+| Part 1 #2 — Rejection/failure handling (Q08) | **Controlled assumption adopted** — see BRD.md; AC07/AC09 unchanged (already matched the assumption); no automated rollback/retry is specified |
+| Part 1 #3 / Part 2 #4 — Manager→HR sequencing | **Recorded as BRD.md Q12**, explicitly flagged as this spec's working assumption (strict sequencing), not yet a confirmed decision |
+| Part 1 #4 — Stakeholder ownership of org-info | **Still open (Q06)** — no assumption adopted; the Q07 assumption above only says organisational-information update "always applies," it does not say who owns executing it |
+| Part 1 #5 / Part 2 #5 — Authorization / RBAC | **Q11 extended** in BRD.md to cover the new downstream-completion actors (AC18/API04), still open |
+| Part 1 #6 / Part 2 #6 — Department/Location/Role selection rule | **Recorded as BRD.md Q13** — still open; AC04 is unchanged (it only requires "a valid selectable option," which holds regardless of what determines the set) |
+| Part 1 #7 / Part 2 #8 — Employee confirmation events | **Fixed** — see the new "Confirmation events" note under Intent/AC01/AC11 below, naming submission acknowledgement, decision-outcome notification, and completion confirmation as three distinct events |
+| Part 2 #1 — Downstream processing completion mechanism | **Fixed** — new `AC18` and `API04` define who completes a downstream step and how; authorization identity remains Q11 (extended), the mechanism itself does not |
+| Part 2 #2 — State-transition model inconsistency | **Fixed** — the status vocabulary table and `AC08` now branch explicitly on whether any downstream step applies |
+| Part 2 #7 — Status-visibility scope (AC12) | **Fixed** — `AC12` no longer excludes completed/rejected requests; the source never stated that exclusion, and restricting it was this spec's own overreach, not a BRD rule |
+
 ## Linked BRD
 [`.ai-context/BRD.md#brd-001-employee-internal-transfer-digital-journey`](../BRD.md#brd-001-employee-internal-transfer-digital-journey)
 
@@ -221,10 +243,10 @@ state decisions of its own.
   Employee Portal, so there are no existing portal capabilities, auth/RBAC modules, or frontend
   modules to link to or reuse.
 - `architecture.md` — **does not exist.** It documented the architecture of an unrelated prior
-  project ("Empty Floor + Circle Tap") that occupied this repository before it was repurposed, and
-  was removed on 2026-09-04 once confirmed unneeded (see `project_context.md`'s "Prior project
-  cleanup" note). No architecture document exists yet for the One-Point Employee Portal; one is
-  expected to emerge from the Day 5 technical plan.
+  project that occupied this repository before it was repurposed, and was removed on 2026-09-04
+  once confirmed unneeded (see `project_context.md`'s "Prior project cleanup" note). No
+  architecture document exists yet for the One-Point Employee Portal; one is expected to emerge
+  from the Day 5 technical plan.
 - [`.agent/rules/int-standards.laravel.md`](../../.agent/rules/int-standards.laravel.md) and
   [`.agent/rules/int-standards.nextjs.md`](../../.agent/rules/int-standards.nextjs.md) — record
   that auth mechanism, API versioning, routing model, and test frameworks are all `[Open]` Day 5
@@ -258,10 +280,17 @@ names in particular depend on Q06/Q07 (open).
 | `submitted` | AC01 — request created, awaiting manager | No |
 | `manager_approved` | AC06 — manager approved, awaiting HR | No |
 | `manager_declined` | AC07 — manager declined | Yes |
-| `hr_approved` | AC08 — HR confirmed eligibility; downstream processing begins if applicable | No |
+| `hr_approved` | AC08 — HR confirmed eligibility. **Transient only** — per the Q07 controlled assumption (see `BRD.md`), the system evaluates immediately whether any downstream step applies and moves on to `downstream_processing` or `completed` in the same transition; a request should not be observed sitting in `hr_approved` | No — see note |
 | `hr_declined` | AC09 — HR did not confirm eligibility | Yes |
-| `downstream_processing` | AC10 — one or more of org-info/payroll/IT/facilities pending | No |
-| `completed` | AC11 — all applicable downstream steps complete | Yes |
+| `downstream_processing` | AC10 — one or more of org-info/payroll/IT/facilities pending, per the Q07 assumption | No |
+| `completed` | AC11 — reached directly from `hr_approved` if the Q07 assumption applies zero downstream steps, or from `downstream_processing` once every applicable step is complete | Yes |
+
+**Fixed in v1.1 (Part 2 review #2):** `hr_approved` was previously marked non-terminal
+unconditionally, which conflicted with AC11's "every downstream step that applies (if any)"
+wording — the zero-downstream-steps case had no path to `completed`. It is now explicit: the
+transition out of `hr_approved` always evaluates applicability (per the Q07 assumption) in the same
+step, so the two possible next states are `downstream_processing` (steps apply) or `completed`
+(none apply), never a state where `hr_approved` itself persists as "current."
 
 | `pendingWith` | Meaning |
 |---|---|
@@ -435,13 +464,46 @@ names in particular depend on Q06/Q07 (open).
   > actors racing for the same currently-pending decision. Both are shape-only contract
   > definitions — neither depends on an unconfirmed business rule.
 
+### `emp-internal-transfer.API04` — Downstream Step Completion
+
+**Business action:** AC18 · **Added in v1.1** in response to Gate 1 review Part 2, observation 1
+(no mechanism previously existed for AC11 to actually be reached when downstream steps apply).
+
+`POST /api/v1/transfer-requests/{transferRequestId}/downstream-steps/{step}/complete`
+
+- **Auth:** Required. **Authorization:** the caller must hold the role responsible for `{step}`
+  (`org_info`, `payroll`, `it`, or `facilities`). **Which real-world role/identity maps to each of
+  these is not confirmed** — this extends Q11 (RBAC resolution mechanism), now covering downstream
+  actors as well as manager/HR. The mechanism below is authoritative regardless of how that mapping
+  is eventually resolved.
+- **Path parameter:** `step` — one of `org_info | payroll | it | facilities`; must be a step this
+  request currently has in `pending` status (per API02's `stages[].steps[]`).
+- **Request payload:** none — this is a pure state-transition action, no business data to submit.
+- **Success — `200 OK`:** same `data` shape as API02/API03. That step's entry in `stages[].steps[]`
+  moves to `complete`. The server then re-evaluates: if every applicable step is now complete, the
+  overall `status` moves to `completed` (AC11); otherwise `status` remains `downstream_processing`.
+- **Exceptions:**
+
+  | HTTP | `errorCode` | Condition | Safe response behaviour |
+  |---|---|---|---|
+  | 401 | `unauthenticated` | No valid credentials presented | No information revealed |
+  | 403 | `forbidden_wrong_stakeholder` | Authenticated, but caller does not hold the role responsible for `{step}` | Generic message; no state change |
+  | 404 | `not_found` | No transfer request exists with the given ID, **or** `{step}` is not a step this request has (e.g. it was never applicable) | Identical response for both — does not reveal which steps apply to a request the caller isn't authorized to act on |
+  | 409 | `invalid_state_transition` | The request is not in `downstream_processing`, or `{step}` is already `complete`, or `{step}` was never marked applicable for this request | No state change |
+  | 429 | `rate_limited` | *(shape only — no threshold decided yet)* | As API01 |
+  | 500 | `internal_error` | Unexpected server failure | Generic message only |
+
+  > This is a single, narrow completion action — not a queue view, dashboard, or working screen for
+  > Payroll/IT/Facilities. Building any of those remains Out of Scope per this spec's "Explicitly
+  > Out of Scope" section; this endpoint exists only so AC11 has a real path to `completed`.
+
 ### Contract Gaps / Open Decisions (not invented as endpoints here)
 
 | Gap | Why it's not defined above |
 |---|---|
-| Reference-data endpoints for selectable departments/locations/roles (to populate the request form and back AC04's validation) | Not named by the BRD or any existing module (this is the first feature in this repository) — flagged for Gate 1 / Day 5, not invented here |
-| A dedicated downstream-status detail endpoint beyond the `stages`/`steps` shape in API02 | Depends on Q06 (org-info stage ownership) and Q07 (applicability rule) — both open |
-| Any endpoint for the manager/HR/Payroll/IT/Facilities side to *act outside* API03's single decision shape (e.g. a bulk queue view for HR) | Out of scope per the spec's "Explicitly Out of Scope" — no dedicated stakeholder interfaces are defined |
+| Reference-data endpoints for selectable departments/locations/roles (to populate the request form and back AC04's validation) | Not named by the BRD or any existing module (this is the first feature in this repository) — flagged for Gate 1 / Day 5, not invented here. Which values are valid is itself an open business rule — see `BRD.md` Q13 |
+| Identity/role mapping for who holds the `org_info`/`payroll`/`it`/`facilities` responsibility API04 checks against | Q11 (extended, 2026-09-08) — the completion *mechanism* is now defined (API04); *who* is authorized is not |
+| Any endpoint for the manager/HR/Payroll/IT/Facilities side beyond API03's decision shape and API04's single completion action (e.g. a bulk queue view for HR, a Payroll dashboard) | Out of scope per the spec's "Explicitly Out of Scope" — no dedicated stakeholder interfaces are defined |
 | Withdrawal/cancellation endpoint | Q09 is open and withdrawal is explicitly Out of Scope |
 
 ### Error Contract
@@ -599,11 +661,18 @@ And no HR eligibility action becomes pending
 ```gherkin
 Given a transfer request that has received manager approval
 When HR confirms the employee is eligible
-Then the request's status transitions to reflect HR approval
-And the "pending with" indicator updates to show the next applicable stakeholder — a downstream
-  function if one applies to this request, or completion if none does
+Then the system evaluates, per the Q07 controlled assumption in BRD.md, which downstream steps
+  (organisational-information, payroll, IT, facilities) apply to this request
+And if one or more steps apply, the request's status transitions to downstream_processing with
+  each applicable step shown as pending
+And if none apply, the request's status transitions directly to completed
 And the employee can see this transition in their status view
 ```
+
+> **Fixed in v1.1 (Gate 1 review Part 2, observation 2):** previously this AC left "the next
+> applicable stakeholder, or completion if none does" implicit without saying how that branch is
+> decided or that it happens in the same transition. It now names the Q07 assumption explicitly and
+> states both branches.
 
 **AC09 — HR does not confirm eligibility**
 ```gherkin
@@ -625,11 +694,13 @@ When the request enters downstream processing
 Then the employee's status view shows each applicable step as pending until it is marked complete
 ```
 
-> This AC deliberately does not state *which* steps apply to a given transfer, or the mechanism
-> by which that is decided — the BRD only says these steps apply "where applicable" without
-> defining the rule. See **Open Decisions** below (Q06, Q07). No system-specific downstream
-> integration is asserted here; see `constitution.md`'s Architectural Constraints — no new
-> integration may be introduced without an ADR regardless of what this spec eventually requires.
+> **Updated in v1.1:** which steps apply to a given transfer is now governed by the Q07 controlled
+> assumption recorded in `BRD.md` (grounded in which fields the request actually changes) rather
+> than left fully undefined — but it remains an assumption, not a confirmed business rule, and
+> **who owns executing the organisational-information step** is still open (Q06). No
+> system-specific downstream integration is asserted here; see `constitution.md`'s Architectural
+> Constraints — no new integration may be introduced without an ADR regardless of what this spec
+> eventually requires.
 
 **AC11 — Request reaches completion**
 ```gherkin
@@ -643,17 +714,27 @@ And the employee sees confirmation that the transfer is complete
 
 **AC12 — View current status**
 ```gherkin
-Given an authenticated employee with a transfer request in any non-completed state
+Given an authenticated employee with a transfer request in any state, including a terminal one
+  (completed, manager_declined, or hr_declined)
 When the employee views their request
 Then the employee sees the request's current status
 ```
 
+> **Fixed in v1.1 (Gate 1 review Part 2, observation 7):** previously restricted to "any
+> non-completed state," which the reviewer correctly noted the source never states as an exclusion
+> — this spec's own overreach, not a BRD rule. Status visibility now covers every state.
+
 **AC13 — View pending action**
 ```gherkin
-Given an authenticated employee with a transfer request in any non-completed state
+Given an authenticated employee with a transfer request in a non-terminal state
 When the employee views their request
 Then the employee sees which stakeholder an action is currently pending with
 ```
+
+> "Pending with" is meaningful only while something is still pending — a terminal request's
+> `pendingWith` value is `none` (see the status vocabulary table), which AC12's status visibility
+> already surfaces; this AC is unchanged from v1.0 in substance, only reworded for clarity against
+> AC12's fix above.
 
 ### Authorization isolation
 
@@ -690,6 +771,39 @@ Then the system denies the attempt
 > coverage) is not confirmed by the BRD (Q11). AC15 asserts the authorization **outcome**, not the
 > resolution mechanism.
 
+### Downstream step completion — added in v1.1
+
+**AC18 — Downstream stakeholder marks their step complete**
+```gherkin
+Given a transfer request in downstream_processing with a step that applies to it and is pending
+When the stakeholder responsible for that step marks it complete
+Then that step's status updates to complete
+And the system re-evaluates whether every applicable step is now complete
+And if so, the request's status transitions to completed (AC11); otherwise it remains
+  downstream_processing with the remaining steps still shown as pending
+```
+
+> Added in response to Gate 1 review Part 2, observation 1: previously no mechanism existed for a
+> downstream stakeholder to actually complete a step, so AC11 had no implementable path once
+> downstream processing began. Who is authorized to act for a given step is Q11 (extended) — open;
+> the mechanism itself (API04) is now defined regardless.
+
+### Confirmation events — clarified in v1.1
+
+In response to Gate 1 review (Part 1 observation 7 / Part 2 observation 8): "the employee receives
+confirmation" is not one event. This spec names three distinct ones, each already covered by an
+existing AC, now made explicit rather than left to be inferred:
+
+1. **Submission acknowledgement** (AC01) — the employee sees their request was accepted and is now
+   pending with their manager, immediately on submission.
+2. **Decision-outcome notification** (AC06/AC07/AC08/AC09) — the employee sees the outcome each
+   time Manager or HR records a decision, approved or declined.
+3. **Completion confirmation** (AC11) — the employee sees the transfer is fully complete once every
+   applicable downstream step (if any) is done.
+
+No new AC was needed for this — all three were already specified; this section exists so a reader
+doesn't have to infer that they're three separate moments rather than one.
+
 ### Auditability
 
 **Not specified as a requirement of this spec.** Neither the approved BRD nor the current
@@ -709,11 +823,13 @@ see `BRD.md`'s Open Decisions / Assumptions / Proposed Rules table for full deta
 | Q02 | Minimum lead time before the effective date | No AC written — see Validation section note |
 | Q03 | Duplicate/concurrent active-transfer handling | No AC written — see dedicated section above |
 | Q05 | Geographic scope (domestic vs. cross-border) | Out of Scope section — cross-border excluded by default |
-| Q06 | Ownership of the organisational-information update stage | AC10 — step tracked generically, owner undefined |
-| Q07 | Rule deciding which downstream steps apply to a given request | AC10, AC11 — steps tracked generically, applicability rule undefined |
-| Q08 | Rejection/rollback semantics once later stages have begun | AC07, AC09 — only the basic non-approved transition is asserted |
+| Q06 | Ownership of the organisational-information update stage | AC10 — step tracked generically, owner still undefined (the Q07 assumption below does not resolve this) |
+| Q07 | Rule deciding which downstream steps apply to a given request | AC10, AC11, AC08 — **controlled assumption adopted in v1.1** (see `BRD.md`); still open for a confirmed answer, but no longer blocking spec-level work |
+| Q08 | Rejection/rollback semantics once later stages have begun | AC07, AC09 — **controlled assumption adopted in v1.1** (see `BRD.md`): rejection is terminal with nothing to roll back; downstream failure surfaces as "pending resolution," not auto-retry/auto-escalate |
 | Q09 | Whether an employee can withdraw/cancel a submitted request | No AC written — see Out of Scope |
-| Q11 | RBAC resolution mechanism for "manager"/"HR" | AC15, AC16 — authorization outcome asserted, resolution mechanism undefined |
+| Q11 | RBAC resolution mechanism for "manager"/"HR" | AC15, AC16 — authorization outcome asserted, resolution mechanism undefined. **Extended in v1.1** to also cover AC18/API04's downstream-step actors |
+| Q12 | Whether Manager→HR sequencing is an enforced rule or incidental source ordering | **New in v1.1** (raised by Gate 1 review) — AC06–AC09 model it as strictly sequential as a working assumption, not yet confirmed |
+| Q13 | Business rule determining valid/selectable department/location/role values | **New in v1.1** (raised by Gate 1 review) — AC04 requires "a valid selectable option" regardless of what determines that set; the set itself is undefined |
 
 ## Explicitly Out of Scope
 
@@ -796,6 +912,7 @@ directly from its AC's Given/When/Then — none introduces a scenario the AC doe
 | `emp-internal-transfer.UT15` | AC15 | A manager who is not the request's employee's manager calls API03 while `pendingWith: manager` | `403 forbidden_wrong_stakeholder`; no state change |
 | `emp-internal-transfer.UT16` | AC16 | A caller without the HR role calls API03 while `pendingWith: hr` | `403 forbidden_wrong_stakeholder`; no state change |
 | `emp-internal-transfer.UT17` | AC17 | A caller with no relationship to the request (not requester/manager/HR) calls API02 or API03 | `403` (API02) / `403 forbidden_wrong_stakeholder` (API03); no data or state change |
+| `emp-internal-transfer.UT18` | AC18 | The stakeholder responsible for a pending, applicable downstream step calls API04 for that step | `200`; that step's status becomes `complete`; overall `status` becomes `completed` if it was the last applicable step, otherwise stays `downstream_processing` |
 
 Boundary/negative coverage folded into the above rather than duplicated as separate IDs:
 UT03/UT04 are parameterised boundary+invalid-input cases; UT07/UT16 double as
@@ -821,6 +938,9 @@ since it spans two UTs and doesn't map to a single AC).
 | §3 "view pending actions" | AC13 | API02 | UT13 |
 | Actors table (§2); Authorization/RBAC questions | AC14–AC17 | API02, API03 | UT14–UT17 |
 | Q09 (withdrawal/cancellation) — **not in source** | — no AC | — no endpoint | — no UT |
+| Gate 1 review Part 2 #1 — downstream completion mechanism (added v1.1) | AC18 | API04 | UT18 |
+| Q12 (Manager→HR sequencing, added v1.1) — **open, spec's working assumption only** | AC06–AC09 | API03 | UT06–UT09 |
+| Q13 (department/location/role selection rule, added v1.1) — **open** | AC04 | API01 | UT04 |
 
 ## Self-Review Against the Day 2 Completion Gate (superseded by Day 3 below, kept for history)
 
@@ -859,3 +979,25 @@ since it spans two UTs and doesn't map to a single AC).
 - Status is `In Peer Review (Gate 1)`. Gate 1 is **not** claimed as Approved — Sourav Kumar Maity
   is recorded above as the assigned reviewer (confirmed distinct from the author, Aditya Hazra);
   this document awaits their Gate 1 decision.
+
+## Self-Review Against Gate 1 Re-Review Readiness (v1.1, 2026-09-08)
+
+- Every item from both review passes has a disposition in "Revision Notes" above — none silently
+  dropped, none silently resolved into a business decision that wasn't actually confirmed.
+- Where no stakeholder answer was available (Q07, Q08), an explicitly labelled controlled
+  assumption was adopted instead of inventing a silent rule — recorded in both `BRD.md` and this
+  spec's Open Decisions table, not just in review prose.
+- Two new BRD open items (Q12, Q13) were added rather than left as unrecorded observations in the
+  review text only.
+- The two genuine internal defects the reviewer found (state-model inconsistency; no downstream-
+  completion mechanism) are fixed, not assumption-scoped — they were specification bugs, not open
+  business questions.
+- AC12's scope was corrected to match the source rather than this spec's own earlier, unjustified
+  restriction.
+- No AC, API, or UT was removed or renumbered — only added (`AC18`, `API04`, `UT18`) or clarified in
+  place, so existing traceability and any work already anchored to `AC01`–`AC17`/`API01`–`API03`/
+  `UT01`–`UT17` stays valid.
+- Status bumped to `Draft v1.1` per the Blueprint's own convention (§12.3) for a revised,
+  resubmitted spec, rather than inventing a new status label.
+- Still no `.plan.md`, `.tasks.md`, migration, controller, service, React component, or production
+  code — this revision stays within spec-authoring scope.

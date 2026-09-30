@@ -29,7 +29,7 @@ Do not treat this file as a summary — it intentionally contains almost nothing
 `.ai-context/` and everything it indexes is the actual source of truth and is kept current.
 Duplicating any of it here would just create a second place for it to go stale.
 
-> **History note:** this repository originally ran a different project ("Empty Floor + Circle
-> Tap"). It was repurposed for the One-Point Employee Portal on 2026-09-03; the prior project's
-> content was removed from the repo once confirmed unneeded (see `project_context.md` and
-> `status.md`). If you're looking for it, it isn't here on purpose, not by accident.
+> **History note:** this repository originally ran a different, unrelated project. It was
+> repurposed for the One-Point Employee Portal on 2026-09-03; the prior project's content was
+> removed from the repo once confirmed unneeded (see `project_context.md` and `status.md`). If
+> you're looking for it, it isn't here on purpose, not by accident.
