@@ -408,3 +408,10 @@ Review flow per Blueprint §12–§14/§18: plan reviewed before tasks, Gate 2 p
 decision on Day 10 — not one batched review of Days 6–9. Tracker rows verified by reopening the
 file. No code, tasks, or ADR files created.
 **Follow-up:** Plan review by Subhajit Mukherjee; then Day 6.
+
+### 2026-10-01 — emp-internal-transfer.plan-gate2-review
+**Prompted by:** Subhajit Mukherjee (Gate 2 Reviewer)
+**Instruction (summary):** Act as Gate 2 reviewer against the INT SDD Blueprint and record the review in the correct artefact.
+**Artefacts touched:** `plans/emp-internal-transfer.plan.md` (header status/decision rows; new "Gate 2 Technical Review" section), `status.md`, `prompt_history.md`.
+**Outcome:** Plan review recorded as Changes Requested: 5 blocking (B1–B5), 12 non-blocking (N1–N12), ADR dispositions, CR dispositions, Day 6 task requirements and a re-review checklist. Findings were checked against spec API03/API04 text, BRD Q07 assumption and test cases AUTH-07/STATE-06/STATE-08/CONC-02. No code, tasks, ADR files, spec or test cases changed (none exist for code; approved artefacts left untouched).
+**Follow-up:** Author fixes B1–B5; spec v1.2.2 to Gate 1 (CR-01, Q14, Q15); name an ADR approver.

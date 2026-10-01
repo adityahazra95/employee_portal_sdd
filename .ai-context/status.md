@@ -1,6 +1,6 @@
 # Project Status Board
 
-_Last updated: 2026-10-01 — updated by: Aditya Hazra (Developer)_
+_Last updated: 2026-10-01 — updated by: Subhajit Mukherjee (Gate 2 Reviewer)_
 
 Single source of truth for **what is happening right now**. Updated the same day by whoever last
 touched an artefact.
@@ -19,11 +19,11 @@ touched an artefact.
 | Item | State |
 |---|---|
 | Feature | `emp-internal-transfer` — Employee Internal Transfer Digital Journey |
-| Stage | **BRD: Gate 1 PASS** · Spec: **Approved — Gate 1 (v1.2.1)** · Plan: **Technical Plan Draft — Technical Review Required** (2026-09-30) |
+| Stage | **BRD: Gate 1 PASS** · Spec: **Approved — Gate 1 (v1.2.1)** · Plan: **Changes Requested — Gate 2 technical review (2026-10-01)** |
 | Owner | Developer (Aditya Hazra) |
 | Gate 1 Reviewer | **Sourav Kumar Maity** |
 | Gate 2 Reviewer | **Subhajit Mukherjee** (assigned 2026-10-01) — also reviews the Day 5 plan and Day 6 tasks |
-| SDD chain position | Day 5 (Technical Plan + Architecture) drafted; awaiting technical review before Day 6 (Tasks) |
+| SDD chain position | Day 5 plan reviewed 2026-10-01: **Changes Requested** (5 blocking, 12 non-blocking). Day 6 (Tasks) stays blocked until re-review |
 
 ## Active specs
 
@@ -42,7 +42,7 @@ touched an artefact.
 | `.agent/rules/int-standards.nextjs.md` | Created | Defaults only — no Next.js code exists in this repo yet to verify against |
 | `specs/emp-internal-transfer.spec.md` | **Approved — Gate 1 (v1.2.1, 2026-09-30)** | AC01–AC18, full API contract (API01–API04, `pending_resolution` step status with a defined exit), error contract, Next.js consumer contract, UT01–UT18, full traceability; all four Gate 1 review passes preserved verbatim plus revision notes for v1.1, v1.2 and v1.2.1 |
 | `test_cases/emp-internal-transfer.test_cases.md` | Updated for v1.2.1 | Broader QA scenarios: API, validation/boundary, auth/RBAC, state-transition, concurrency, contract, Next.js consumer, UI states, accessibility, cross-browser, regression. v1.2.1 added `AUTH-09`/`10`, `STATE-09`…`13`, `FE-09` (API04 and `pending_resolution`) |
-| `plans/emp-internal-transfer.plan.md` | **Draft — Technical Review Required** (2026-09-30) | Day 5 technical plan; every technical choice labelled Fact / Approved / Rule / Proposed / Open / ADR, since no Laravel/Next.js source exists yet |
+| `plans/emp-internal-transfer.plan.md` | **Draft — Changes Requested** (Gate 2 technical review, 2026-10-01) | Day 5 technical plan; every technical choice labelled Fact / Approved / Rule / Proposed / Open / ADR, since no Laravel/Next.js source exists yet |
 | `tasks/`, `decisions/`, `releases/` | Empty | Hold only `.gitkeep`. `tasks/` blocked until the plan is reviewed; ADR candidates are listed in the plan (§O), no ADR file written until approved |
 | `.ai-context/templates/` | Present — 6 files | Restored 2026-09-30; the two that carried prior-project content (`spec.template.md`, `plan.template.md`) rewritten from the Blueprint's own §11.4/§29 canonical skeletons; two minor stale file-path references cleaned in `release.template.md`/`tasks.template.md`. The other four (`adr`, `hotfix-spec`, `release`, `tasks`) were already generic |
 | `.ai-context/inventory/` | Empty (`.gitkeep` only) | Not part of the Blueprint's canonical `.ai-context/` structure (§15) — was prior-project discovery output (an existing codebase's module/API/DB inventory on a different stack); removed again 2026-09-30 after being reintroduced, since there's no code in this repo yet to inventory |
@@ -511,3 +511,27 @@ Day 6 (Tasks).
 
 **Next:** Subhajit Mukherjee reviews `plans/emp-internal-transfer.plan.md`. Day 6 starts once that
 review passes.
+
+## Gate 2 technical review of the plan — 2026-10-01 — **CHANGES REQUESTED**
+
+- Subhajit Mukherjee (Gate 2 Reviewer) reviewed `plans/emp-internal-transfer.plan.md` against the
+  Approved spec v1.2.1, BRD-001, the constitution and the v1.2.1 test cases. Review recorded at
+  the end of the plan ("Gate 2 Technical Review"). Architecture/security sign-off (§12.1)
+  **withheld**.
+- **Blocking (B1–B5):** B1 the CR-01 ordering is accepted but amends the API03 contract, so it needs
+  spec v1.2.2 through Gate 1; B2 API04 checks 404 before the role check and leaks which steps exist;
+  B3 plan says "no outbound calls" while proposing live IdP/HRIS reads (no failure handling, no
+  error mapping, constitution box mis-ticked); B4 no self-approval / segregation-of-duties rule
+  (new Q14 for Gate 1); B5 no ADR approver exists (Technical Lead unassigned).
+- **Non-blocking (N1–N12):** Q07 makes the zero-step path unreachable via API (and no-op transfers
+  are unruled, Q15); manager snapshot strands requests; rate-limit amendments (API01 5/min,
+  unauthenticated limit, limiter cache store); `X-Request-Id` validation; transition-log
+  retention/purpose; at-rest/in-transit and `reason` visibility; SQLite ignores row locks (test on
+  the production engine); scaffold vs test-first; CI scanning missing; `pendingWith` ordering into
+  spec; CSRF/CORS if cookie auth; downstream actors cannot view their requests.
+- ADRs: 0005, 0006, 0007, 0009, 0010, 0011 accepted (with amendments); 0008 conditional; 0001–0004
+  not decided. No ADR files written.
+- No spec, test case, code, task or ADR file was changed in this review.
+
+**Next:** author revises the plan for B1–B5, raises spec v1.2.2 (CR-01) with Q14/Q15 to Sourav Kumar
+Maity, and a named ADR approver is recorded; resubmit for re-review. Day 6 starts after that.

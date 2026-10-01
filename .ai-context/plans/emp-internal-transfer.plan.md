@@ -4,10 +4,10 @@
 |---|---|
 | **Feature** | `emp-internal-transfer` |
 | **Title** | Employee Internal Transfer Digital Journey — Technical Plan |
-| **Status** | `Draft — Technical Review Required` |
+| **Status** | `Draft — Changes Requested (Gate 2 technical review, 2026-10-01)` |
 | **Author** | Aditya Hazra (Developer) · **Date:** 2026-09-30 |
 | **Technical reviewer** | **Subhajit Mukherjee** (Gate 2 Reviewer; assigned 2026-10-01) — plan review + architecture/security sign-off |
-| **Review decision** | Pending |
+| **Review decision** | **Changes Requested** — 2026-10-01. Architecture/security sign-off **withheld** until B1–B5 are resolved. See "Gate 2 Technical Review" at the end of this file |
 
 ## Review Flow (agreed 2026-10-01)
 
@@ -542,3 +542,95 @@ non-blocking). Fold into the next spec revision — likely the one CR-01/CR-02/C
 - [ ] CR-02 decided or the form explicitly deferred
 - [ ] Rate-limit values approved (ADR-0010)
 - [ ] Every open decision above still explicit — none silently resolved
+
+---
+
+# Gate 2 Technical Review — Plan (Blueprint §13, "Gate 1 continued", with §12.1 sign-off)
+
+| | |
+|---|---|
+| **Reviewer** | Subhajit Mukherjee (Gate 2 Reviewer) — distinct from author and Gate 1 reviewer |
+| **Date** | 2026-10-01 |
+| **Reviewed** | This plan, read against the Approved spec v1.2.1, BRD-001 (incl. controlled assumptions), `constitution.md`, the v1.2.1 test cases, and the Blueprint security checklist (§20/§30) |
+| **Scope** | Plan only. No code, tasks or ADR files exist, so there is no diff to review; per-task Gate 2 starts Days 7–8 |
+| **Decision** | **Changes Requested** (binary per §12.3). The approach is sound; five items below must be fixed or answered before I sign off and before Day 6 derives tasks |
+| **Architecture/security sign-off (§12.1)** | **Withheld** — open until B1–B5 are closed. The Constitution Check's last box stays unticked |
+
+## What I checked and accept
+
+- Layering and the Laravel/Next.js boundary match the constitution; no business rule or
+  authorization decision is placed in the frontend.
+- Labelling every statement Fact / Approved / Rule / Proposed / Open is the right call with no
+  scaffold in the repo. Nothing in the plan silently resolves Q06/Q11/Q12/Q13; Q03 and OD-03 stay open.
+- Never persisting `hr_approved`, deriving `pendingWith`/`stages[]` on read, and one transaction per
+  state change with a request-row lock are sound and testable (ADR-0006, ADR-0007).
+- Using opaque, non-sequential ids and keeping reference/org data out of this feature's ownership
+  is correct.
+- Rate limits are stated per endpoint (constitution rule satisfied in form; amendments in N3).
+
+## Blocking findings — must be resolved before sign-off
+
+| ID | Plan § | Finding | Required change |
+|---|---|---|---|
+| **B1** | H.3, CR-01, header ("does not change any AC, API contract…") | I accept the proposed API03 order, in particular rule 5 (a caller who already decided their own stage gets `409 already_processed`). It is what makes a double-click (`CONC-02`) return 409 rather than a confusing 403. But it **changes the meaning of the approved API03 exception table**: the contract says `403` for "not the stakeholder the currently-pending stage requires", and a manager on a `manager_approved` request is exactly that, yet the plan returns 409. `already_processed` is also defined in the spec as a *concurrent race*, and rule 5 uses it for a sequential repeat. This is a **spec amendment**, not just a test-case edit, and the plan's claim that it changes no API contract is not accurate | (1) Reword the header/Derived From claim. (2) Raise CR-01 as a spec change (v1.2.2) to Sourav Kumar Maity: amend the API03 exceptions table and the `already_processed` definition to state the precedence order. (3) Update `AUTH-07`, `STATE-06`, `STATE-08` and confirm `CONC-02`. (4) Each precedence rule 1–8 gets its own failing test before API03 is implemented |
+| **B2** | E, H.3 (API04 order) | API04 checks `404` (request or step missing) **before** the role check `403`. The spec says the 404 must not "reveal which steps apply to a request the caller isn't authorized to act on". With this order, any authenticated user can tell, per request id, whether a step exists (404 vs 403) | Check the caller's role for `{step}` first (it does not depend on the request), then request/step existence: `401` → `403` (no role for `{step}`) → `404` → `409`. Add a test for "role-less caller, unknown request" and "role-less caller, real request" returning the same `403` |
+| **B3** | J, K, M, Constitution Check | The plan says "no outbound calls" (J, K, M "Integration logging: not applicable") and ticks "no new … external service", while H.1, I and OD-05/06 propose **live reads** from the portal IdP/HRIS for authentication, manager relationship, reference data and the employee's current dept/loc/role. These are outbound dependencies on the request path of every endpoint. Failure handling (timeout, source down, stale cache), the error to return (the spec's envelope only has `500`), logging, and the effect on the p95 < 400 ms target are all missing | (1) Replace "no outbound calls" with the real dependency list. (2) Add K rows: source timeout/unavailable at API01 (snapshot read), API02/03/04 (relationship lookup), reference-data validation. (3) State the error mapping — either `500 internal_error` (no contract change) or a new `503` (spec amendment; bundle with B1). (4) State timeouts and cache TTL/staleness for authorization data (a stale cache must not keep a revoked HR role alive). (5) Re-word the Constitution Check box to "depends on ADR-0001/0003 approval" |
+| **B4** | H.2 (new gap) | **Self-approval / segregation of duties is not addressed.** A user holding the HR role can submit a transfer, and HR (AC16) then approves it; the same applies to a downstream-role holder completing a step on their own transfer. Neither the spec nor the plan says the requester may not act on their own request | Raise as a new open decision for Gate 1 (suggest Q14) and add to the plan's Risks table. Reviewer recommendation: a Policy rule that **denies any stage action by the requester on their own request**, regardless of roles held. Do not implement until Gate 1 records the rule (it is a business/authorization rule, so it needs an AC) |
+| **B5** | O, P (R-01), `constitution.md` Governance | Every ADR in §O needs approval by "TL", but the constitution says the Technical Lead is **not assigned**. I can review, but ADR-0001/0002/0003/0004 cannot be "decided" with no approver, and the constitution owner is also TBD (amendments need one) | Name an ADR approver for this feature (and who co-signs ADR-0001/0004 for Security) and record it in the constitution's role table. Until then ADR status stays Proposed and Day 6 tasks depending on them stay blocked |
+
+## Non-blocking findings — fix in this plan revision or carry as tracked items
+
+| ID | Plan § | Finding | Recommendation |
+|---|---|---|---|
+| N1 | J, G, N | Per the BRD Q07 assumption, **org-info always applies**, so HR approve always creates ≥1 step and the "zero steps → `completed`" branch (AC11 direct path, UT11) is **unreachable through the API**. Also, a request whose target equals the current dept/loc/role is a no-op transfer; the spec is silent on whether it is allowed | Say so in G and N: test the zero-step branch at domain-unit level with applicability stubbed, and do not claim it is covered end to end. Ask the author/Gate 1 whether the no-op case needs a rule (propose Q15). Do not decide it in code |
+| N2 | C, F, OD-06 | Snapshotting the manager at submission strands the request if the manager leaves or moves: AC15 says "the employee's manager", and there is no cancel (Q09), reassign, delegation (Q11) or escalation (Q08) | My recommendation for OD-06: resolve the manager **at action time** from the ADR-0004 source and keep the submission-time value only as informational. If you keep the snapshot, add "stuck request, no recovery path" to Risks |
+| N3 | M, ADR-0010 | Per-user throttling does nothing for unauthenticated floods (401s). Laravel's limiter needs a cache store, and Redis would be a **new datastore** (constitution). API01 at 10/min allows ten duplicates a minute while Q03/CR-03 leave API01 unprotected | Approve the values with these changes: API01 → **5/min** as an interim duplicate mitigation; add an IP-keyed limit for unauthenticated attempts; return `Retry-After`; state the limiter's cache store and that it uses an already-approved store. Record the decision in ADR-0010 |
+| N4 | M, ADR-0009 | Accepting an inbound `X-Request-Id` lets a client inject arbitrary text into every log line (log injection/spoofing) | Accept only a bounded, validated format (e.g. length ≤ 64, `[A-Za-z0-9-]`), otherwise generate one. Add a test |
+| N5 | F, ADR-0008 | The spec says audit logging is **not** a requirement and tells us to amend the constitution first if it is. `TransitionLog` plus `decided-by`/`completed-by` refs is a persisted record of who approved what — an audit trail in all but name — with no retention or access rule | Accept ADR-0008 only if it states: purpose (operational integrity, not audit), retention period, who may read it, no exposure via API, ids only. If the business wants it as audit, that is a constitution amendment first |
+| N6 | F, M | Data-in-transit and at-rest handling are not stated (Blueprint security checklist). `reason` is rated High sensitivity (free text), and HR/manager visibility of `reason` is a known spec gap | Add: TLS-only, at-rest encryption expectation for the DB, retention for `reason`, and a request to Gate 1 on who may see `reason` |
+| N7 | L, ADR-0006 | `SELECT … FOR UPDATE` is ignored on SQLite (Laravel's default test DB), so `CONC-01/02` and the last-two-steps race would pass without testing anything. Guard evaluation also sits before the lock in H.3 (read, then re-check at rule 8) | ADR-0002 must pick an engine that supports row locks **and** CI tests must run on that engine. Lock first, then evaluate rules 3–6 under the lock. Add DB unique constraints on (request, stage) and (request, step) as a backstop |
+| N8 | Sequencing 1 | Scaffolding is not behaviour but is not in the constitution's trivial tier either, and test-first has "no exceptions" | Day 6 must state how the scaffold task satisfies test-first (e.g. a failing health/smoke test written first) or record a reviewer-approved exception on the task |
+| N9 | Sequencing, M | No CI step for SAST/DAST/dependency scanning (Blueprint §20, security checklist item) | Add a pipeline task in Sequencing, early (right after the scaffold), so every later task is scanned |
+| N10 | F (derivation) | `pendingWith` = first open step in the fixed order org_info→payroll→it→facilities. Acceptable as the P4-09 resolution, but the steps are parallel and the order reads as a dependency | Write it into the spec in the same v1.2.2 revision as B1 so the frontend and tests rely on a contract, not on the plan; frontend renders `stages[].steps[]` |
+| N11 | H.1, ADR-0001 | If option (b) cookie auth is chosen: CSRF protection, CORS, SameSite and session-fixation handling are not in the ADR's scope | Add them to ADR-0001's required content; Security co-sign required either way |
+| N12 | H.2, OD-10 | Downstream stakeholders can complete a step (API04) but cannot view the request (API02), so they act blind | Agree this should go to Gate 1 as a spec decision with CR-02 rather than being fixed in code |
+
+## Disposition of ADR candidates (reviewer position — no ADR file may be written until B5 is closed)
+
+| ADR | Reviewer position |
+|---|---|
+| 0001 Authentication | **Not decided.** Prefer reusing the existing portal IdP (a) if it exists and is reachable; needs facts from the portal owner. Must cover N11. Security co-sign |
+| 0002 Stack baseline | **Not decided.** Needs an owner (B5). Constraint from this review: DB engine supports row locks and is the CI test engine (N7) |
+| 0003 Reference/org data | **Not decided.** Reject option (c), local system-of-record tables. Prefer (a) live read with bounded cache over (b), which adds a scheduler. Must cover B3 |
+| 0004 Role mapping | **Not decided.** Depends on Q11/Q06. Must include the self-action rule once Gate 1 rules on B4 |
+| 0005 Integration pattern | **Accept** manual-only for v1; business owner to confirm |
+| 0006 Concurrency | **Accept** pessimistic row lock, with N7 |
+| 0007 Persisted state model | **Accept** |
+| 0008 Transition log | **Conditional accept** — N5 |
+| 0009 Correlation id | **Accept** with N4 |
+| 0010 Rate limits | **Accept** with N3 amendments |
+| 0011 API01 idempotency | **Accept** UI-only as interim, with the tighter API01 limit; CR-03 and Q03 stay open |
+
+## Change requests
+
+- **CR-01:** agreed in substance (B1). Needs Sourav Kumar Maity's Gate 1 re-review as spec v1.2.2.
+- **CR-02:** agreed it is a spec addition. Decide by Day 6 whether the form is built against a stub endpoint or explicitly deferred; the form task must not start on an invented endpoint.
+- **CR-03:** deferred with Q03; no change in this review.
+- **New:** Q14 (self-action, B4) and Q15 (no-op transfer, N1) to be raised by the author.
+
+## Requirements for Day 6 `tasks.md` (so the next review is quick)
+
+1. One task per reviewable PR, each naming its ACs/APIs/UTs by ID; no task spans two endpoints.
+2. Each task records where the **Red** evidence is captured (failing test output or commit), per the constitution; I verify it at Gate 2.
+3. First tasks: scaffold (N8), CI scanning (N9), then the domain state machine with unit tests.
+4. Tasks that depend on an undecided ADR or CR are marked blocked by ID, not started against a guess.
+5. Logging tasks carry an explicit "no PII" test (ids only; `reason` and target values never logged).
+
+## Re-review checklist (what I will check when this is resubmitted)
+
+- [ ] B1: spec v1.2.2 amendment submitted to Gate 1; plan header claim corrected; test cases updated
+- [ ] B2: API04 order changed to role → existence → state, with the two paired tests
+- [ ] B3: dependency list, failure rows, error mapping, cache/staleness rules; Constitution Check re-worded
+- [ ] B4: Q14 raised to Gate 1 and listed in Risks
+- [ ] B5: ADR approver named in the constitution
+- [ ] N1–N12 each either fixed or listed as a tracked item with an owner
