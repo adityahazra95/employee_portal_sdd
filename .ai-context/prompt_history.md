@@ -363,3 +363,48 @@ Day 5, and one non-blocking editorial note (the stale "Q01–Q11" count in Conte
 board now shows Gate 1 complete and `plans/` unblocked. No tests were run (documentation-only
 change).
 **Follow-up:** Day 5 Technical Plan. Fix the Context Q01–Q13 wording in the next spec revision.
+
+### 2026-09-30 — emp-internal-transfer.Day5
+**Prompted by:** Aditya Hazra (Developer)
+**Prompt identity:** `emp-internal-transfer.Day5`
+**Intent:** Technical Plan + Architecture
+**Stage:** Planning
+**Gate 1:** Approved (spec v1.2.1, commit `f80e669`)
+**Plan:** `.ai-context/plans/emp-internal-transfer.plan.md` (Draft — Technical Review Required)
+**Implementation performed:** No
+**Production code generated:** No
+**Source files read:** `BRD.md`, `constitution.md`, `project_context.md`, `status.md`,
+`prompt_history.md`, `specs/emp-internal-transfer.spec.md`,
+`test_cases/emp-internal-transfer.test_cases.md`, `templates/plan.template.md`,
+`templates/adr.template.md`, `.agent/rules/int-standards.laravel.md`,
+`.agent/rules/int-standards.nextjs.md`, `.agent/workflows/generate-plan.md` /
+`generate-tests.md` / `code-review.md`, INT SDD Blueprint v1.0 (already extracted this session),
+`Requirement for SDD.docx`, the activity tracker's Day 5 planned row. Repository checked for
+Laravel/Next.js source: none present.
+**Artefacts touched:** `plans/emp-internal-transfer.plan.md` (new), `status.md`,
+`project_context.md` (Current state), `prompt_history.md`.
+**ADR candidates:** ADR-0001 authentication; 0002 stack baseline (versions, router, DB engine,
+test frameworks); 0003 reference-data source; 0004 role/relationship mapping; 0005 integration
+pattern; 0006 concurrency control; 0007 persisted state model; 0008 transition log; 0009
+correlation id; 0010 rate-limit thresholds; 0011 API01 idempotency.
+**Unresolved technical decisions:** all eleven ADRs above; OD-05 (source of the employee's current
+dept/loc/role for Q07); OD-06 (manager snapshot vs live lookup); R-01 (no technical reviewer);
+R-02 (no scaffold). **Raised as change requests:** CR-01 (contradicting approved test cases on
+API03 error precedence), CR-02 (reference-data endpoint), CR-03 (API01 idempotency key).
+**Business decisions carried, not resolved:** Q03, Q06, Q11, Q12, Q13; controlled assumptions
+Q05/Q07/Q08; OD-03, OD-09, OD-10.
+**Confirms:** no AC/API/UT changed; no production code, migrations, controllers, services,
+components, ADR files or tasks created. Stopped after Day 5.
+
+### 2026-10-01 — emp-internal-transfer.gate2-reviewer-and-tracker
+**Prompted by:** Aditya Hazra (Developer)
+**Instruction (summary):** Record Days 4–5 in the activity tracker; assign the Gate 2 reviewer;
+clarify whether the plan and Days 6–9 should be reviewed per stage or in one batch.
+**Artefacts touched:** `source-docs/Day-to-day activities-SDD.xlsx` (Day 4/5 rows),
+`constitution.md` (Gate 2 Reviewer row), `plans/emp-internal-transfer.plan.md` (reviewer, review
+flow, R-01 resolved), `status.md`, `prompt_history.md`.
+**Outcome:** Gate 2 Reviewer recorded as Subhajit Mukherjee (name only; email withheld as PII).
+Review flow per Blueprint §12–§14/§18: plan reviewed before tasks, Gate 2 per task/PR, final
+decision on Day 10 — not one batched review of Days 6–9. Tracker rows verified by reopening the
+file. No code, tasks, or ADR files created.
+**Follow-up:** Plan review by Subhajit Mukherjee; then Day 6.

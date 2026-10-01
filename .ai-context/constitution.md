@@ -29,10 +29,12 @@ below may be stricter than the standard; none may weaken it.
 | Technical Lead / Architect / constitution owner | **TBD** | Not yet assigned for this project |
 | Spec Author | **Aditya Hazra** | Authors specs/plans/tasks for this feature (confirmed 2026-09-08, `emp-internal-transfer`) |
 | Gate 1 Reviewer | **Sourav Kumar Maity** | Independent peer reviewer — confirmed distinct from the author (confirmed 2026-09-08, `emp-internal-transfer`) |
+| Gate 2 Reviewer | **Subhajit Mukherjee** | Technical review of the plan (Blueprint §13, "Gate 1 continued", including the architecture/security sign-off §12.1 requires) and of `tasks.md`; Gate 2 code review per task/PR through Days 7–9; final Gate 2 decision on Day 10. Distinct from the author and the Gate 1 reviewer (confirmed 2026-10-01, `emp-internal-transfer`) |
 
-Technical Lead remains `[Open]` — no roster entry yet. Spec Author and Gate 1 Reviewer are
+Technical Lead remains `[Open]` — no roster entry yet. Spec Author and both reviewers are
 confirmed per-feature as of `emp-internal-transfer`; if a later feature uses different people,
-update this table rather than assuming these two carry forward automatically.
+update this table rather than assuming they carry forward automatically. Contact details are not
+recorded here — they're PII, which never enters these files.
 
 ## Testing Discipline
 
