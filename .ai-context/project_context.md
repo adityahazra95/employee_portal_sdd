@@ -78,10 +78,11 @@ live in `decisions/ADR-NNNN-*.md`.
 
 ## Current state
 
-**In Discovery.** Day 1 (Discovery + Requirement Analysis) is complete for `emp-internal-transfer`.
-No `.spec.md`, `.plan.md`, `.tasks.md`, or implementation code exists yet — none is authorized
-until an Approved spec and an approved, test-first task breakdown exist. See
-[status.md](status.md).
+**Technical Plan Draft (Day 5).** For `emp-internal-transfer`, the BRD passed Gate 1 and the spec
+is **Approved** (v1.2.1, 2026-09-30). The technical plan
+(`plans/emp-internal-transfer.plan.md`) is drafted and awaits technical review. No `.tasks.md` or
+implementation code exists yet — tasks follow a reviewed plan, and code follows approved,
+test-first tasks. See [status.md](status.md).
 
 ## Prior project cleanup (2026-09-04 through 2026-09-30)
 
